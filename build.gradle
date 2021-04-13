@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'gg.archipelago.APClient'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    inJar
+}
+
+dependencies {
+    inJar "org.java-websocket:Java-WebSocket:1.5.1"
+    inJar 'com.google.code.gson:gson:2.8.6'
+    configurations.compile.extendsFrom(configurations.inJar)
+}
+
+jar {
+    from {
+        configurations.compileClasspath.filter{
+            it.exists() }.collect {
+            it.isDirectory() ? it : zipTree(it) }
+    }
+}
