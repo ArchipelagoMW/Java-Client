@@ -20,12 +20,14 @@ public class DataManager {
 
     LocationManager locationManager;
     ItemManager itemManager;
+    APClient apClient;
 
     SaveData save = new SaveData();
 
-    public DataManager(LocationManager locationManager, ItemManager itemManager) {
+    public DataManager(LocationManager locationManager, ItemManager itemManager, APClient apClient) {
         this.locationManager = locationManager;
         this.itemManager = itemManager;
+        this.apClient = apClient;
     }
 
     public void load(String saveID, int slotID) {
@@ -52,8 +54,16 @@ public class DataManager {
         }
     }
 
-    void save() {
+    public void save() {
+        if(!apClient.isConnected())
+            return;
         try {
+            save.id = apClient.getRoomInfo().seedName;
+            save.slotID = apClient.getSlot();
+            save.index = apClient.getItemManager().getIndex();
+            save.checkedLocations = locationManager.getCheckedLocations();
+            save.receivedItems = apClient.getItemManager().getReceivedItems();
+
             File saveDataPackage = new File(saveDataLocation);
 
             //noinspection ResultOfMethodCallIgnored

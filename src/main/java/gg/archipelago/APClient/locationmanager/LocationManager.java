@@ -2,6 +2,7 @@ package gg.archipelago.APClient.locationmanager;
 
 import gg.archipelago.APClient.APClient;
 import gg.archipelago.APClient.APWebSocket;
+import gg.archipelago.APClient.DataManager;
 import gg.archipelago.APClient.network.LocationChecks;
 
 import java.util.HashSet;
@@ -20,7 +21,7 @@ public class LocationManager {
 
     public boolean checkLocation(int id) {
         checkedLocations.add(id);
-
+        apClient.getDataManager().save();
         LocationChecks packet = new LocationChecks();
         packet.locations.add(id);
         if(webSocket != null && webSocket.isAuthenticated()) {
@@ -57,5 +58,9 @@ public class LocationManager {
 
     public void setAPWebSocket(APWebSocket apWebSocket) {
         this.webSocket = apWebSocket;
+    }
+
+    public Set<Integer> getCheckedLocations() {
+        return checkedLocations;
     }
 }

@@ -31,6 +31,7 @@ public class ItemManager {
                 if(i == this.index) {
                     this.index++;
                     apClient.onReceiveItem(ids[i-index].item, apClient.getDataPackage().getLocation(ids[i-index].location), apClient.getRoomInfo().getPlayer(apClient.getTeam(), ids[i-index].player).alias);
+                    apClient.getDataManager().save();
                 }
             }
         }
@@ -49,5 +50,13 @@ public class ItemManager {
 
     public void setAPWebSocket(APWebSocket apWebSocket) {
         this.webSocket = apWebSocket;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public ArrayList<Integer> getReceivedItems() {
+        return receivedItems;
     }
 }

@@ -59,7 +59,7 @@ public abstract class APClient {
         apWebSocket = new APWebSocket(this);
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
-        dataManager = new DataManager(locationManager,itemManager);
+        dataManager = new DataManager(locationManager,itemManager, this);
     }
 
     private void loadDataPackage() {
@@ -248,5 +248,9 @@ public abstract class APClient {
 
     public ItemManager getItemManager() {
         return itemManager;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 }
