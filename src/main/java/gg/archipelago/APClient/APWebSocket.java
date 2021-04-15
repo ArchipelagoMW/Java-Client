@@ -52,8 +52,9 @@ public class APWebSocket extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         LOGGER.info("Got Packet: "+message);
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(message);
 
-        JsonElement element = JsonParser.parseString(message);
         JsonArray cmdList = element.getAsJsonArray();
 
         for(int i = 0; cmdList.size() > i; ++i) {

@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'gg.archipelago.APClient'
@@ -15,14 +15,12 @@ configurations {
 
 dependencies {
     inJar "org.java-websocket:Java-WebSocket:1.5.1"
-    inJar 'com.google.code.gson:gson:2.8.6'
+    compileOnly 'com.google.code.gson:gson:2.8.0'
     configurations.compile.extendsFrom(configurations.inJar)
 }
 
 jar {
     from {
-        configurations.compileClasspath.filter{
-            it.exists() }.collect {
-            it.isDirectory() ? it : zipTree(it) }
+        configurations.inJar.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
