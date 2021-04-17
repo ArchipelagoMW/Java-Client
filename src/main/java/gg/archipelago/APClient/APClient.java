@@ -46,11 +46,8 @@ public abstract class APClient {
 
     protected APClient(String game) {
         loadDataPackage();
-        String u = Utils.GetUUID().trim();
-        if (u.startsWith("UUID"))
-            u=u.substring(4);
-        u=u.trim();
-        UUID = u;
+
+        UUID = dataPackage.getUUID();
 
         this.game = game;
 

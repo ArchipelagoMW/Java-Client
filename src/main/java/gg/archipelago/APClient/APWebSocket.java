@@ -116,8 +116,10 @@ public class APWebSocket extends WebSocketClient {
             else if (cmd.cmd == APPacketType.DataPackage){
                 JsonElement data = packet.getAsJsonObject().get("data");
                 DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
+                dataPackage.uuid = apClient.getUUID();
                 apClient.setDataPackage(dataPackage);
                 if (dataPackage.getVersion() != 0) {
+
                     apClient.saveDataPackage();
                 }
             }
