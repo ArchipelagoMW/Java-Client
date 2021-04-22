@@ -35,6 +35,13 @@ public class APWebSocket extends WebSocketClient {
     private boolean attemptingReconnect;
 
     private String seedName;
+    private final Timer reconnectTimer = new Timer();
+    private final TimerTask reconnectTask = new TimerTask() {
+        @Override
+        public void run() {
+            apClient.reconnect();
+        }
+    };
 
     public APWebSocket(URI serverUri, APClient apClient) {
         super(serverUri);
@@ -87,13 +94,16 @@ public class APWebSocket extends WebSocketClient {
             }
             else if (cmd.cmd == APPacketType.Connected) {
                 ConnectedPacket connectedPacket = gson.fromJson(packet, ConnectedPacket.class);
+
                 apClient.setTeam(connectedPacket.team);
                 apClient.setSlot(connectedPacket.slot);
 
                 apClient.getRoomInfo().networkPlayers = connectedPacket.players;
                 apClient.setAlias(apClient.getRoomInfo().getPlayer(connectedPacket.team,connectedPacket.slot).alias);
 
-                ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName);
+                JsonElement data = packet.getAsJsonObject().get("slot_data");
+
+                ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName,data);
                 apClient.onConnectResult(event);
                 if(!event.isCanceled()) {
                     apClient.loadSave(seedName, connectedPacket.slot);
@@ -190,7 +200,6 @@ public class APWebSocket extends WebSocketClient {
         if (code == 1006) {
             reason = "Lost connection to the Archipelago server.";
             attemptingReconnect = true;
-
         }
 
         if(attemptingReconnect && reconnectAttempt <= 10) {
@@ -198,16 +207,11 @@ public class APWebSocket extends WebSocketClient {
             reconnectAttempt++;
             apClient.onClose(reason, reconnectDelay/1000);
 
-            TimerTask reconnect = new TimerTask() {
-                @Override
-                public void run() {
-                    apClient.reconnect();
-                }
-            };
-            new Timer().schedule(reconnect, reconnectDelay);
+            reconnectTimer.schedule(reconnectTask, reconnectDelay);
         }
         else {
             attemptingReconnect = false;
+            reconnectTimer.cancel();
             apClient.onClose(reason, 0);
         }
     }
@@ -216,6 +220,12 @@ public class APWebSocket extends WebSocketClient {
     public void onError(Exception ex) {
         //apClient.onError(ex);
         LOGGER.log(Level.WARNING, "Error in websocket connection");
+    }
+
+    @Override
+    public void connect(){
+        super.connect();
+        reconnectTimer.cancel();
     }
 
     public void sendChat(String message) {

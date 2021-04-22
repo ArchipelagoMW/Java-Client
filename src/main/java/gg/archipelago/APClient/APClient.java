@@ -32,9 +32,9 @@ public abstract class APClient {
 
     private DataPackage dataPackage;
 
-    private LocationManager locationManager;
-    private ItemManager itemManager;
-    private DataManager dataManager;
+    private final LocationManager locationManager;
+    private final ItemManager itemManager;
+    private final DataManager dataManager;
 
     public static final Version protocolVersion = new Version(0,0,4);
 
@@ -180,7 +180,7 @@ public abstract class APClient {
         return locationManager.checkLocation(advancementID);
     }
 
-    public abstract boolean onConnectResult(ConnectionResultEvent event);
+    public abstract void onConnectResult(ConnectionResultEvent event);
 
     public abstract void onJoinRoom();
 
