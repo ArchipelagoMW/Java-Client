@@ -35,17 +35,14 @@ public class APWebSocket extends WebSocketClient {
     private boolean attemptingReconnect;
 
     private String seedName;
-    private final Timer reconnectTimer = new Timer();
-    private final TimerTask reconnectTask = new TimerTask() {
-        @Override
-        public void run() {
-            apClient.reconnect();
-        }
-    };
+    private static Timer reconnectTimer;
 
     public APWebSocket(URI serverUri, APClient apClient) {
         super(serverUri);
         this.apClient = apClient;
+        if (reconnectTimer == null)
+            reconnectTimer = new Timer();
+        reconnectTimer.cancel();
     }
 
     public APWebSocket(APClient apClient) {
@@ -54,6 +51,7 @@ public class APWebSocket extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakeData) {
+        reconnectAttempt = 0;
     }
 
     @Override
@@ -104,10 +102,11 @@ public class APWebSocket extends WebSocketClient {
                 JsonElement data = packet.getAsJsonObject().get("slot_data");
 
                 ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName,data);
+                apClient.loadSave(seedName, connectedPacket.slot);
+                apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
+
                 apClient.onConnectResult(event);
                 if(!event.isCanceled()) {
-                    apClient.loadSave(seedName, connectedPacket.slot);
-                    apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
                     authenticated = true;
                 } else {
                     apClient.close();
@@ -194,6 +193,7 @@ public class APWebSocket extends WebSocketClient {
     @Override
     public void onClose(int code, String wsReason, boolean remote) {
         LOGGER.info(String.format("Connection closed by %s Code: %s Reason: %s", (remote ? "remote peer" : "us"), code, wsReason));
+        authenticated = false;
         String reason = wsReason;
         if (code == -1)
             reason = "Connection refused by the Archipelago server.";
@@ -207,6 +207,15 @@ public class APWebSocket extends WebSocketClient {
             reconnectAttempt++;
             apClient.onClose(reason, reconnectDelay/1000);
 
+            TimerTask reconnectTask = new TimerTask() {
+                @Override
+                public void run() {
+                    apClient.reconnect();
+                }
+            };
+
+            reconnectTimer.cancel();
+            reconnectTimer = new Timer();
             reconnectTimer.schedule(reconnectTask, reconnectDelay);
         }
         else {

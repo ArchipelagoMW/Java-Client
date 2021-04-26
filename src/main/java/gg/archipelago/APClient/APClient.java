@@ -194,8 +194,6 @@ public abstract class APClient {
 
     public abstract void onReceiveItem(int item, String location, String player);
 
-    public abstract void receiveItems(int item);
-
     public DataPackage getDataPackage() {
         return dataPackage;
     }
