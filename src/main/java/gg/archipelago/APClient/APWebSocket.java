@@ -194,6 +194,7 @@ public class APWebSocket extends WebSocketClient {
     public void onClose(int code, String wsReason, boolean remote) {
         LOGGER.info(String.format("Connection closed by %s Code: %s Reason: %s", (remote ? "remote peer" : "us"), code, wsReason));
         authenticated = false;
+        attemptingReconnect = false;
         String reason = wsReason;
         if (code == -1)
             reason = "Connection refused by the Archipelago server.";
