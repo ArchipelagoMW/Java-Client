@@ -37,7 +37,7 @@ public abstract class APClient {
     private final ItemManager itemManager;
     private final DataManager dataManager;
 
-    public static final Version protocolVersion = new Version(0,0,4);
+    public static final Version protocolVersion = new Version(0,1,0);
 
     private int team;
     private int slot;
@@ -51,8 +51,6 @@ public abstract class APClient {
         UUID = dataPackage.getUUID();
 
         this.game = game;
-
-
 
         apWebSocket = new APWebSocket(this);
         locationManager = new LocationManager(this);

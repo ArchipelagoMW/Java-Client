@@ -56,7 +56,7 @@ public class APWebSocket extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        LOGGER.info("Got Packet: "+message);
+        LOGGER.fine("Got Packet: "+message);
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(message);
 
@@ -186,13 +186,13 @@ public class APWebSocket extends WebSocketClient {
 
     private void sendManyPackets(APPacket[] packet) {
         String json = gson.toJson(packet);
-        LOGGER.info("Sent Packet: "+json);
+        LOGGER.fine("Sent Packet: "+json);
         send(json);
     }
 
     @Override
     public void onClose(int code, String wsReason, boolean remote) {
-        LOGGER.info(String.format("Connection closed by %s Code: %s Reason: %s", (remote ? "remote peer" : "us"), code, wsReason));
+        LOGGER.fine(String.format("Connection closed by %s Code: %s Reason: %s", (remote ? "remote peer" : "us"), code, wsReason));
         authenticated = false;
         attemptingReconnect = false;
         String reason = wsReason;
