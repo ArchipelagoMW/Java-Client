@@ -14,6 +14,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -96,7 +97,8 @@ public class APWebSocket extends WebSocketClient {
                 apClient.setTeam(connectedPacket.team);
                 apClient.setSlot(connectedPacket.slot);
 
-                apClient.getRoomInfo().networkPlayers = connectedPacket.players;
+                apClient.getRoomInfo().networkPlayers.addAll(connectedPacket.players);
+                apClient.getRoomInfo().networkPlayers.add(new NetworkPlayer(connectedPacket.team,0,"Archipelago"));
                 apClient.setAlias(apClient.getRoomInfo().getPlayer(connectedPacket.team,connectedPacket.slot).alias);
 
                 JsonElement data = packet.getAsJsonObject().get("slot_data");
@@ -128,7 +130,6 @@ public class APWebSocket extends WebSocketClient {
                 dataPackage.uuid = apClient.getUUID();
                 apClient.setDataPackage(dataPackage);
                 if (dataPackage.getVersion() != 0) {
-
                     apClient.saveDataPackage();
                 }
             }
@@ -168,7 +169,7 @@ public class APWebSocket extends WebSocketClient {
     }
 
     private void updateRoom(RoomUpdatePacket updateRoomPacket) {
-        if (updateRoomPacket.networkPlayers != null)
+        if (updateRoomPacket.networkPlayers.size() != 0)
             roomInfo.networkPlayers = updateRoomPacket.networkPlayers;
         if (updateRoomPacket.datapackageVersion > roomInfo.datapackageVersion)
             getDataPackage();

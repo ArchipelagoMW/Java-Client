@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import gg.archipelago.APClient.parts.NetworkPlayer;
 import gg.archipelago.APClient.parts.Version;
 
+import java.util.ArrayList;
+
 public class RoomInfoPacket extends APPacket {
 
     public Version version;
@@ -24,7 +26,7 @@ public class RoomInfoPacket extends APPacket {
     @SerializedName("location_check_points")
     public int locationCheckPoints;
 
-    public NetworkPlayer[] networkPlayers;
+    public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();
 
     @SerializedName("datapackage_version")
     public int datapackageVersion;

@@ -3,6 +3,7 @@ package gg.archipelago.APClient.itemmanager;
 import gg.archipelago.APClient.APClient;
 import gg.archipelago.APClient.APWebSocket;
 import gg.archipelago.APClient.network.SyncPacket;
+import gg.archipelago.APClient.parts.DataPackage;
 import gg.archipelago.APClient.parts.NetworkItem;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class ItemManager {
     APClient apClient;
     APWebSocket webSocket;
 
-    ArrayList<Integer> receivedItems = new ArrayList<>();
+    ArrayList<NetworkItem> receivedItems = new ArrayList<>();
 
     int index;
 
@@ -21,19 +22,23 @@ public class ItemManager {
         this.apClient = apClient;
     }
 
-    public void receiveItems(NetworkItem[] ids, int index) {
+    public void receiveItems(ArrayList<NetworkItem> ids, int index) {
         if (index == 0) {
             receivedItems = new ArrayList<>();
         }
         if (receivedItems.size() == index) {
-            for (int i = index; i < index + ids.length; i++) {
-                receivedItems.add(ids[i-index].item);
-                if(i == this.index) {
-                    this.index++;
-                    apClient.onReceiveItem(ids[i-index].item, apClient.getDataPackage().getLocation(ids[i-index].location), apClient.getRoomInfo().getPlayer(apClient.getTeam(), ids[i-index].player).alias);
-                    apClient.getDataManager().save();
-                }
+            receivedItems.addAll(ids);
+            DataPackage dp = apClient.getDataPackage();
+            int myTeam = apClient.getTeam();
+            for (int i = this.index; i < receivedItems.size(); i++) {
+                String location = dp.getLocation(receivedItems.get(i).locationID);
+                int itemID = receivedItems.get(i).itemID;
+                String sendingPlayer = apClient.getRoomInfo().getPlayer(myTeam,receivedItems.get(i).playerID).alias;
+                apClient.onReceiveItem(itemID,location,sendingPlayer);
             }
+
+            this.index = receivedItems.size();
+            apClient.getDataManager().save();
         }
         else {
             if(webSocket != null) {
@@ -43,7 +48,7 @@ public class ItemManager {
         }
     }
 
-    public void writeFromSave(ArrayList<Integer> receivedItems, int index) {
+    public void writeFromSave(ArrayList<NetworkItem> receivedItems, int index) {
         this.receivedItems = receivedItems;
         this.index = index;
     }
@@ -56,7 +61,15 @@ public class ItemManager {
         return index;
     }
 
-    public ArrayList<Integer> getReceivedItems() {
+    public ArrayList<NetworkItem> getReceivedItems() {
         return receivedItems;
+    }
+
+    public ArrayList<Integer> getReceivedItemIDs() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (NetworkItem receivedItem : receivedItems) {
+            ids.add(receivedItem.itemID);
+        }
+        return ids;
     }
 }

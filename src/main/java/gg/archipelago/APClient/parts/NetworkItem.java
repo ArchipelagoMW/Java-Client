@@ -5,12 +5,12 @@ import com.google.gson.annotations.SerializedName;
 public class NetworkItem {
 
     @SerializedName("item")
-    public int item;
+    public int itemID;
 
     @SerializedName("location")
-    public int location;
+    public int locationID;
 
     @SerializedName("player")
-    public int player;
+    public int playerID;
 
 }

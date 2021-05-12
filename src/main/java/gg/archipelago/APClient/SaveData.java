@@ -1,6 +1,7 @@
 package gg.archipelago.APClient;
 
 import com.google.gson.annotations.SerializedName;
+import gg.archipelago.APClient.parts.NetworkItem;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class SaveData {
     public Set<Integer> checkedLocations = new HashSet<>();
 
     @SerializedName("items")
-    public ArrayList<Integer> receivedItems = new ArrayList<>();
+    public ArrayList<NetworkItem> receivedItems = new ArrayList<>();
 
     @SerializedName("index")
     public int index = 0;

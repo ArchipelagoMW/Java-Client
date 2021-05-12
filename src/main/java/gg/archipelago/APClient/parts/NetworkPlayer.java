@@ -8,4 +8,11 @@ public class NetworkPlayer {
     public String alias;
 
     public String name;
+
+    public NetworkPlayer(int team, int slot, String name) {
+        this.slot = slot;
+        this.name = name;
+        this.alias = name;
+        this.team = team;
+    }
 }
