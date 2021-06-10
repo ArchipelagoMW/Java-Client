@@ -52,7 +52,6 @@ public class APWebSocket extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakeData) {
-        reconnectAttempt = 0;
     }
 
     @Override
@@ -112,6 +111,8 @@ public class APWebSocket extends WebSocketClient {
                     authenticated = true;
                 } else {
                     apClient.close();
+                    //close out of this loop because we are no longer interested in further commands from the server.
+                    break;
                 }
 
             }
@@ -237,6 +238,8 @@ public class APWebSocket extends WebSocketClient {
     public void connect(){
         super.connect();
         reconnectTimer.cancel();
+        attemptingReconnect = false;
+        reconnectAttempt = 0;
     }
 
     public void sendChat(String message) {
