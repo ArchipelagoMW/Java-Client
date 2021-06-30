@@ -5,6 +5,7 @@ import gg.archipelago.APClient.events.ConnectionResultEvent;
 import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
 import gg.archipelago.APClient.network.ClientStatusPacket;
+import gg.archipelago.APClient.network.SyncPacket;
 import gg.archipelago.APClient.parts.DataPackage;
 import gg.archipelago.APClient.network.RoomInfoPacket;
 import gg.archipelago.APClient.parts.Version;
@@ -250,5 +251,9 @@ public abstract class APClient {
 
     public void setGameState(ClientStatus status) {
         apWebSocket.sendPacket(new ClientStatusPacket(status));
+    }
+
+    public void sync() {
+        apWebSocket.sendPacket(new SyncPacket());
     }
 }
