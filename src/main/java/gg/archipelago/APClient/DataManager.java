@@ -37,13 +37,16 @@ public class DataManager {
             String json = Files.readAllLines(path).get(0);
             save = gson.fromJson(json,SaveData.class);
 
-            //check if our saved ID matches the one we got from AP
+            //check if our saved ID matches the one that was provided
             if(save.id.equals(saveID) && save.slotID == slotID) {
                 locationManager.writeFromSave(save.checkedLocations);
                 itemManager.writeFromSave(save.receivedItems, save.index);
             }
             else {
+                //its a new save so make a new save and save the id and slot number.
                 save = new SaveData();
+                save.id = saveID;
+                save.slotID = slotID;
                 save();
             }
 
@@ -55,12 +58,13 @@ public class DataManager {
     }
 
     public void save() {
-        if(!apClient.isConnected())
-            return;
         try {
-            save.id = apClient.getRoomInfo().seedName;
-            save.slotID = apClient.getSlot();
-            save.index = apClient.getItemManager().getIndex();
+            //only save this stuff if your connected otherwise keep it the same from last load.
+            if(apClient.isConnected()) {
+                save.id = apClient.getRoomInfo().seedName;
+                save.slotID = apClient.getSlot();
+                save.index = apClient.getItemManager().getIndex();
+            }
             save.checkedLocations = locationManager.getCheckedLocations();
             save.receivedItems = apClient.getItemManager().getReceivedItems();
 
@@ -79,7 +83,7 @@ public class DataManager {
             fileOut.close();
 
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING,"unable to save DataPackage.",e);
+            LOGGER.log(Level.WARNING,"Unable to save.",e);
         }
     }
 

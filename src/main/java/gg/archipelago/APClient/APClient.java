@@ -8,6 +8,7 @@ import gg.archipelago.APClient.network.ClientStatusPacket;
 import gg.archipelago.APClient.network.SyncPacket;
 import gg.archipelago.APClient.parts.DataPackage;
 import gg.archipelago.APClient.network.RoomInfoPacket;
+import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.Version;
 
 import java.io.*;
@@ -38,7 +39,7 @@ public abstract class APClient {
     private final ItemManager itemManager;
     private final DataManager dataManager;
 
-    public static final Version protocolVersion = new Version(0,1,0);
+    public static final Version protocolVersion = new Version(0,1,4);
 
     private int team;
     private int slot;
@@ -46,7 +47,7 @@ public abstract class APClient {
     private final String game;
     private String alias;
 
-    protected APClient(String game) {
+    protected APClient(String game, String saveID, int slotID) {
         loadDataPackage();
 
         UUID = dataPackage.getUUID();
@@ -57,6 +58,7 @@ public abstract class APClient {
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
         dataManager = new DataManager(locationManager,itemManager, this);
+        dataManager.load(saveID,slotID);
     }
 
     private void loadDataPackage() {
@@ -186,7 +188,7 @@ public abstract class APClient {
 
     public abstract void onPrint(String print);
 
-    public abstract void onPrintJson(APPrint apPrint);
+    public abstract void onPrintJson(APPrint apPrint, String type, int sending, NetworkItem receiving);
 
     public abstract void onError(Exception ex);
 
@@ -231,10 +233,6 @@ public abstract class APClient {
 
     protected void setAlias(String alias) {
         this.alias = alias;
-    }
-
-    public void loadSave(String seedName, int slot) {
-        dataManager.load(seedName,slot);
     }
 
     public LocationManager getLocationManager() {

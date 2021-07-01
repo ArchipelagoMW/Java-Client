@@ -103,7 +103,8 @@ public class APWebSocket extends WebSocketClient {
                 JsonElement data = packet.getAsJsonObject().get("slot_data");
 
                 ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName,data);
-                apClient.loadSave(seedName, connectedPacket.slot);
+                //dont need to load the save here,
+                //apClient.loadSave(seedName, connectedPacket.slot);
                 apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
 
                 apClient.onConnectResult(event);
@@ -114,6 +115,8 @@ public class APWebSocket extends WebSocketClient {
                     //close out of this loop because we are no longer interested in further commands from the server.
                     break;
                 }
+                //only send locations if the connection is not canceled.
+                apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
 
             }
             else if (cmd.cmd == APPacketType.ConnectionRefused) {
@@ -155,7 +158,7 @@ public class APWebSocket extends WebSocketClient {
                         print.parts[p].text = apClient.getDataPackage().getLocation(locationID);
                     }
                 }
-                apClient.onPrintJson(print);
+                apClient.onPrintJson(print, print.type,print.receiving,print.item);
             }
             else if (cmd.cmd == APPacketType.RoomUpdate){
                 updateRoom(gson.fromJson(packet, RoomUpdatePacket.class));
