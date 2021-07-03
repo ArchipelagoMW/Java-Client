@@ -1,6 +1,7 @@
 package gg.archipelago.APClient;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
 
@@ -50,9 +51,11 @@ public class DataManager {
                 save();
             }
 
-        } catch (IOException e) {
-            LOGGER.info("no SavePackage found creating a new one.");
+        } catch (Exception e) {
+            LOGGER.info("invalid SavePackage found creating a new one.");
             save = new SaveData();
+            save.id = saveID;
+            save.slotID = slotID;
             save();
         }
     }
