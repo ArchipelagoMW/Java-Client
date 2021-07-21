@@ -1,26 +1,34 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
+    id 'com.github.johnrengelman.shadow'
     id 'java-library'
+
 }
 
-group 'gg.archipelago.APClient'
-version '1.1'
+archivesBaseName = "Archipelago.MultiClient.Java"
+group = 'gg.archipelago.APClient'
+version = '1.1'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
 
 repositories {
     mavenCentral()
 }
 
-configurations {
-    inJar
-}
-
 dependencies {
-    inJar "org.java-websocket:Java-WebSocket:1.5.1"
-    compileOnly 'com.google.code.gson:gson:2.8.0'
-    configurations.compile.extendsFrom(configurations.inJar)
+    implementation "org.java-websocket:Java-WebSocket:1.5.1"
+    implementation 'com.google.code.gson:gson:2.8.0'
 }
 
-jar {
-    from {
-        configurations.inJar.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "archipelagoClient" // Default value is "shadow"
+}
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
+
+shadowJar {
 }
