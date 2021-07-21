@@ -17,6 +17,24 @@ public class DataPackage implements Serializable {
 
     public String uuid = UUID.randomUUID().toString();
 
+    public DataPackage() {
+        version = -1;
+    }
+
+    public String getItem(int itemID) {
+        if (items.containsKey(itemID)) {
+            return items.get(itemID);
+        }
+        return String.format("Unknown Item [%d]", itemID);
+    }
+
+    public String getLocation(int locationID) {
+        if (locations.containsKey(locationID)) {
+            return locations.get(locationID);
+        }
+        return String.format("Unknown Location [%d]", locationID);
+    }
+
     public int getVersion() {
         return version;
     }
@@ -27,26 +45,6 @@ public class DataPackage implements Serializable {
 
     public Hashtable<Integer, String> getLocations() {
         return locations;
-    }
-
-    public DataPackage() {
-        version = -1;
-    }
-
-    public String getItem(int itemID) {
-        String item = String.format("Unknown Item [%d]", itemID);
-        if (items.containsKey(itemID)) {
-            item = items.get(itemID);
-        }
-        return item;
-    }
-
-    public String getLocation(int locationID) {
-        String location = String.format("Unknown Location [%d]", locationID);
-        if (locations.containsKey(locationID)) {
-            location = locations.get(locationID);
-        }
-        return location;
     }
 
     public String getUUID() {
