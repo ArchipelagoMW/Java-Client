@@ -26,6 +26,7 @@ public class RoomInfoPacket extends APPacket {
     @SerializedName("location_check_points")
     public int locationCheckPoints;
 
+    @SerializedName("players")
     public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();
 
     @SerializedName("datapackage_version")

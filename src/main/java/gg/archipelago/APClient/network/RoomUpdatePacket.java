@@ -8,10 +8,13 @@ import java.util.ArrayList;
 
 public class RoomUpdatePacket extends APPacket {
 
+    @SerializedName("version")
     public Version version;
 
+    @SerializedName("tags")
     public String[] tags;
 
+    @SerializedName("password")
     public boolean password;
 
     @SerializedName("forfeit_mode")
@@ -29,7 +32,8 @@ public class RoomUpdatePacket extends APPacket {
     @SerializedName("location_check_points")
     public int locationCheckPoints;
 
-    public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();;
+    @SerializedName("players")
+    public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();
 
     @SerializedName("datapackage_version")
     public int datapackageVersion;

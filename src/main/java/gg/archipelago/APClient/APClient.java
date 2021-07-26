@@ -39,7 +39,7 @@ public abstract class APClient {
     private final ItemManager itemManager;
     private final DataManager dataManager;
 
-    public static final Version protocolVersion = new Version(0,1,4);
+    public static final Version protocolVersion = new Version(0,1,5);
 
     private int team;
     private int slot;

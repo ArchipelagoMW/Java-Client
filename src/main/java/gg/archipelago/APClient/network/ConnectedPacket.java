@@ -16,5 +16,5 @@ public class ConnectedPacket extends APPacket {
     @SerializedName("missing_locations")
     public int[] missingLocations = new int[]{};
     @SerializedName("checked_locations")
-    public int[] checkedLocations = new int[]{};;
+    public int[] checkedLocations = new int[]{};
 }

@@ -25,8 +25,6 @@ public class APWebSocket extends WebSocketClient {
 
     private final APClient apClient;
 
-    private RoomInfoPacket roomInfo;
-
     private final Gson gson = new Gson();
 
     private boolean authenticated = false;
@@ -70,7 +68,8 @@ public class APWebSocket extends WebSocketClient {
 
             //check if room info packet
             if (cmd.cmd == APPacketType.RoomInfo) {
-                roomInfo = gson.fromJson(packet, RoomInfoPacket.class);
+                RoomInfoPacket roomInfo = gson.fromJson(packet, RoomInfoPacket.class);
+
                 //save room info
                 apClient.setRoomInfo(roomInfo);
 
@@ -89,6 +88,7 @@ public class APWebSocket extends WebSocketClient {
 
                 //send reply
                 sendPacket(connectPacket);
+                apClient.setRoomInfo(roomInfo);
             }
             else if (cmd.cmd == APPacketType.Connected) {
                 ConnectedPacket connectedPacket = gson.fromJson(packet, ConnectedPacket.class);
@@ -161,7 +161,8 @@ public class APWebSocket extends WebSocketClient {
                 apClient.onPrintJson(print, print.type,print.receiving,print.item);
             }
             else if (cmd.cmd == APPacketType.RoomUpdate){
-                updateRoom(gson.fromJson(packet, RoomUpdatePacket.class));
+                RoomUpdatePacket updatePacket = gson.fromJson(packet,RoomUpdatePacket.class);
+                updateRoom(updatePacket);
             }
             else if (cmd.cmd == APPacketType.ReceivedItems){
                 RecivedItems items = gson.fromJson(packet, RecivedItems.class);
@@ -173,9 +174,11 @@ public class APWebSocket extends WebSocketClient {
     }
 
     private void updateRoom(RoomUpdatePacket updateRoomPacket) {
-        if (updateRoomPacket.networkPlayers.size() != 0)
-            roomInfo.networkPlayers = updateRoomPacket.networkPlayers;
-        if (updateRoomPacket.datapackageVersion > roomInfo.datapackageVersion)
+        if (updateRoomPacket.networkPlayers.size() != 0) {
+            apClient.getRoomInfo().networkPlayers = updateRoomPacket.networkPlayers;
+            apClient.getRoomInfo().networkPlayers.add(new NetworkPlayer(apClient.getTeam(), 0, "Archipelago"));
+        }
+        if (updateRoomPacket.datapackageVersion > apClient.getRoomInfo().datapackageVersion)
             getDataPackage();
         apClient.setHintPoints(updateRoomPacket.hintPoints);
         apClient.setAlias(apClient.getRoomInfo().getPlayer(apClient.getTeam(), apClient.getSlot()).alias);
