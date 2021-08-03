@@ -4,10 +4,8 @@ import gg.archipelago.APClient.Print.APPrint;
 import gg.archipelago.APClient.events.ConnectionResultEvent;
 import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
-import gg.archipelago.APClient.network.ClientStatusPacket;
-import gg.archipelago.APClient.network.SyncPacket;
+import gg.archipelago.APClient.network.*;
 import gg.archipelago.APClient.parts.DataPackage;
-import gg.archipelago.APClient.network.RoomInfoPacket;
 import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.Version;
 
@@ -44,21 +42,27 @@ public abstract class APClient {
     private int team;
     private int slot;
     private String name;
-    private final String game;
+    private String game;
     private String alias;
+    private String[] tags;
 
-    protected APClient(String game, String saveID, int slotID) {
+    protected APClient(String saveID, int slotID) {
         loadDataPackage();
 
         UUID = dataPackage.getUUID();
 
-        this.game = game;
-
-        apWebSocket = new APWebSocket(this);
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
         dataManager = new DataManager(locationManager,itemManager, this);
         dataManager.load(saveID,slotID);
+    }
+
+    public void setGame(String game) {
+        this.game = game;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
     }
 
     private void loadDataPackage() {
@@ -105,11 +109,12 @@ public abstract class APClient {
     }
 
     public boolean isConnected() {
-        return apWebSocket.isOpen();
+        return apWebSocket != null && apWebSocket.isOpen();
     }
 
     public void close() {
-        apWebSocket.close();
+        if (apWebSocket != null)
+            apWebSocket.close();
     }
 
     public void setPassword(String password) {
@@ -190,6 +195,8 @@ public abstract class APClient {
 
     public abstract void onPrintJson(APPrint apPrint, String type, int sending, NetworkItem receiving);
 
+    public abstract void onBounced(BouncedPacket bp);
+
     public abstract void onError(Exception ex);
 
     public abstract void onClose(String Reason, int attemptingReconnect);
@@ -254,4 +261,13 @@ public abstract class APClient {
     public void sync() {
         apWebSocket.sendPacket(new SyncPacket());
     }
+
+    public void sendBounce(BouncePacket bouncePacket) {
+        apWebSocket.sendBouncePacket(bouncePacket);
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
 }

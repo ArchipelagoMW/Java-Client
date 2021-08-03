@@ -14,9 +14,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Level;
 
 public class APWebSocket extends WebSocketClient {
@@ -42,10 +40,6 @@ public class APWebSocket extends WebSocketClient {
         if (reconnectTimer == null)
             reconnectTimer = new Timer();
         reconnectTimer.cancel();
-    }
-
-    public APWebSocket(APClient apClient) {
-        this(URI.create(""), apClient);
     }
 
     @Override
@@ -84,7 +78,7 @@ public class APWebSocket extends WebSocketClient {
                 connectPacket.password = (apClient.getPassword() == null) ? "" : apClient.getPassword();
                 connectPacket.uuid = apClient.getUUID();
                 connectPacket.game = apClient.getGame();
-                connectPacket.tags = new String[0];
+                connectPacket.tags = apClient.getTags();
 
                 //send reply
                 sendPacket(connectPacket);
@@ -105,18 +99,17 @@ public class APWebSocket extends WebSocketClient {
                 ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName,data);
                 //dont need to load the save here,
                 //apClient.loadSave(seedName, connectedPacket.slot);
-                apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
 
                 apClient.onConnectResult(event);
                 if(!event.isCanceled()) {
                     authenticated = true;
+                    //only send locations if the connection is not canceled.
+                    apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
                 } else {
-                    apClient.close();
+                    this.close();
                     //close out of this loop because we are no longer interested in further commands from the server.
                     break;
                 }
-                //only send locations if the connection is not canceled.
-                apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
 
             }
             else if (cmd.cmd == APPacketType.ConnectionRefused) {
@@ -170,6 +163,16 @@ public class APWebSocket extends WebSocketClient {
 
                 itemManager.receiveItems(items.items, items.index);
             }
+            else if (cmd.cmd == APPacketType.Bounced) {
+                BouncedPacket bp = gson.fromJson(packet, BouncedPacket.class);
+                JsonObject jsonObject = packet.getAsJsonObject();
+                jsonObject.remove("games");
+                jsonObject.remove("slots");
+                jsonObject.remove("tags");
+                jsonObject.remove("cmd");
+                bp.setData(jsonObject);
+                apClient.onBounced(bp);
+            }
         }
     }
 
@@ -190,6 +193,18 @@ public class APWebSocket extends WebSocketClient {
 
     public void sendPacket(APPacket packet) {
         sendManyPackets(new APPacket[]{packet});
+    }
+
+    public void sendBouncePacket(BouncePacket bouncePacket) {
+        Gson excludeGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        JsonObject packet = excludeGson.toJsonTree(bouncePacket).getAsJsonObject();
+        HashMap<String, Object> data = bouncePacket.getData();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            packet.add(entry.getKey(), gson.toJsonTree(entry.getValue()));
+        }
+        String json = gson.toJson(new JsonObject[]{packet});
+        LOGGER.fine("Sent Bounce Packet Packet: "+json);
+        send(json);
     }
 
     private void sendManyPackets(APPacket[] packet) {

@@ -33,6 +33,10 @@ public enum APPacketType {
     Say,
     @SerializedName("GetDataPackage")
     GetDataPackage,
+    @SerializedName("Bounce")
+    Bounce,
+    @SerializedName("Bounced")
+    Bounced,
     @SerializedName("Sync")
     Sync
 }

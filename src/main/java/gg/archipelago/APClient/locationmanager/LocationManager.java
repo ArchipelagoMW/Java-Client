@@ -44,7 +44,7 @@ public class LocationManager {
                 packet.locations.add(missingCheck);
             }
         }
-        if(webSocket != null)
+        if(webSocket != null && !packet.locations.isEmpty())
             webSocket.sendPacket(packet);
     }
 
