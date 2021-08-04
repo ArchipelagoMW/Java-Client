@@ -18,6 +18,8 @@ public class BouncePacket extends APPacket {
     @SerializedName("tags")
     public String[] tags = new String[]{};
 
+    @Expose
+    @SerializedName("data")
     private HashMap<String, Object> data;
 
     public BouncePacket() {

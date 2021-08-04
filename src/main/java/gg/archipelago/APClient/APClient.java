@@ -256,7 +256,8 @@ public abstract class APClient {
     }
 
     public void setGameState(ClientStatus status) {
-        apWebSocket.sendPacket(new ClientStatusPacket(status));
+        if(apWebSocket.isAuthenticated())
+            apWebSocket.sendPacket(new ClientStatusPacket(status));
     }
 
     public void sync() {
@@ -264,9 +265,8 @@ public abstract class APClient {
     }
 
     public void sendBounce(BouncePacket bouncePacket) {
-        if(apWebSocket != null && apWebSocket.isAuthenticated()) {
-            apWebSocket.sendBouncePacket(bouncePacket);
-        }
+        if(apWebSocket.isAuthenticated())
+            apWebSocket.sendPacket(bouncePacket);
     }
 
     public void disconnect() {

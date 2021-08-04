@@ -168,14 +168,7 @@ public class APWebSocket extends WebSocketClient {
                 itemManager.receiveItems(items.items, items.index);
             }
             else if (cmd.cmd == APPacketType.Bounced) {
-                BouncedPacket bp = gson.fromJson(packet, BouncedPacket.class);
-                JsonObject jsonObject = packet.getAsJsonObject();
-                jsonObject.remove("games");
-                jsonObject.remove("slots");
-                jsonObject.remove("tags");
-                jsonObject.remove("cmd");
-                bp.setData(jsonObject);
-                apClient.onBounced(bp);
+                apClient.onBounced(gson.fromJson(packet, BouncedPacket.class));
             }
         }
     }
@@ -212,18 +205,6 @@ public class APWebSocket extends WebSocketClient {
 
     public void sendPacket(APPacket packet) {
         sendManyPackets(new APPacket[]{packet});
-    }
-
-    public void sendBouncePacket(BouncePacket bouncePacket) {
-        Gson excludeGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        JsonObject packet = excludeGson.toJsonTree(bouncePacket).getAsJsonObject();
-        HashMap<String, Object> data = bouncePacket.getData();
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            packet.add(entry.getKey(), gson.toJsonTree(entry.getValue()));
-        }
-        String json = gson.toJson(new JsonObject[]{packet});
-        LOGGER.fine("Sent Bounce Packet Packet: "+json);
-        send(json);
     }
 
     private void sendManyPackets(APPacket[] packet) {
