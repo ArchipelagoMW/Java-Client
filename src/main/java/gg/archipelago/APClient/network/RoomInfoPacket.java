@@ -5,6 +5,7 @@ import gg.archipelago.APClient.parts.NetworkPlayer;
 import gg.archipelago.APClient.parts.Version;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RoomInfoPacket extends APPacket {
 
@@ -30,7 +31,10 @@ public class RoomInfoPacket extends APPacket {
     public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();
 
     @SerializedName("datapackage_version")
-    public int datapackageVersion;
+    public int datapackageVersion = -1;
+
+    @SerializedName("datapackage_versions")
+    public HashMap<String, Integer> datapackageVersions = new HashMap<>();
 
     @SerializedName("seed_name")
     public String seedName;

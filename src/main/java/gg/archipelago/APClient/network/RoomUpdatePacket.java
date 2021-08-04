@@ -5,6 +5,7 @@ import gg.archipelago.APClient.parts.NetworkPlayer;
 import gg.archipelago.APClient.parts.Version;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RoomUpdatePacket extends APPacket {
 
@@ -37,5 +38,8 @@ public class RoomUpdatePacket extends APPacket {
 
     @SerializedName("datapackage_version")
     public int datapackageVersion;
+
+    @SerializedName("datapackage_versions")
+    public HashMap<String, Integer> datapackageVersions = new HashMap<>();
 
 }

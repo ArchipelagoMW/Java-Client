@@ -3,6 +3,7 @@ package gg.archipelago.APClient;
 import com.google.gson.*;
 import gg.archipelago.APClient.Print.APPrint;
 import gg.archipelago.APClient.Print.APPrintType;
+import gg.archipelago.APClient.events.ConnectionAttemptEvent;
 import gg.archipelago.APClient.events.ConnectionResultEvent;
 import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.network.ConnectionResult;
@@ -67,8 +68,7 @@ public class APWebSocket extends WebSocketClient {
                 //save room info
                 apClient.setRoomInfo(roomInfo);
 
-                if (roomInfo.datapackageVersion > apClient.getDataPackage().getVersion() || roomInfo.datapackageVersion == 0)
-                    getDataPackage();
+                checkDataPackage(roomInfo.datapackageVersions);
 
                 seedName = roomInfo.seedName;
 
@@ -96,15 +96,19 @@ public class APWebSocket extends WebSocketClient {
 
                 JsonElement data = packet.getAsJsonObject().get("slot_data");
 
-                ConnectionResultEvent event = new ConnectionResultEvent(ConnectionResult.Success, connectedPacket.team,connectedPacket.slot,seedName,data);
+                ConnectionAttemptEvent attemptConnectionEvent = new ConnectionAttemptEvent(connectedPacket.team,connectedPacket.slot,seedName,data);
                 //dont need to load the save here,
                 //apClient.loadSave(seedName, connectedPacket.slot);
+                apClient.onAttemptConnection(attemptConnectionEvent);
 
-                apClient.onConnectResult(event);
-                if(!event.isCanceled()) {
+                if(!attemptConnectionEvent.isCanceled()) {
                     authenticated = true;
                     //only send locations if the connection is not canceled.
+                    apClient.getLocationManager().addCheckedLocations(connectedPacket.checkedLocations);
                     apClient.getLocationManager().sendIfChecked(connectedPacket.missingLocations);
+
+                    ConnectionResultEvent connectionResultEvent = new ConnectionResultEvent(ConnectionResult.Success,connectedPacket.team,connectedPacket.slot,seedName,data);
+                    apClient.onConnectResult(connectionResultEvent);
                 } else {
                     this.close();
                     //close out of this loop because we are no longer interested in further commands from the server.
@@ -126,7 +130,7 @@ public class APWebSocket extends WebSocketClient {
                 DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
                 dataPackage.uuid = apClient.getUUID();
                 apClient.setDataPackage(dataPackage);
-                if (dataPackage.getVersion() != 0) {
+                if (dataPackage.getVerison() != 0) {
                     apClient.saveDataPackage();
                 }
             }
@@ -181,14 +185,29 @@ public class APWebSocket extends WebSocketClient {
             apClient.getRoomInfo().networkPlayers = updateRoomPacket.networkPlayers;
             apClient.getRoomInfo().networkPlayers.add(new NetworkPlayer(apClient.getTeam(), 0, "Archipelago"));
         }
-        if (updateRoomPacket.datapackageVersion > apClient.getRoomInfo().datapackageVersion)
-            getDataPackage();
+
+        checkDataPackage(updateRoomPacket.datapackageVersions);
+
         apClient.setHintPoints(updateRoomPacket.hintPoints);
         apClient.setAlias(apClient.getRoomInfo().getPlayer(apClient.getTeam(), apClient.getSlot()).alias);
     }
 
-    private void getDataPackage() {
-        sendPacket(new GetDataPackagePacket());
+    private void checkDataPackage(HashMap<String,Integer> versions) {
+        HashSet<String> exclusions = new HashSet<>();
+        for (Map.Entry<String, Integer> game : versions.entrySet()) {
+            //the game does NOT need updating add it to the exclusion list.
+            if(Objects.equals(apClient.getDataPackage().getVersions().get(game.getKey()), game.getValue())) {
+                exclusions.add(game.getKey());
+            }
+        }
+
+        if (exclusions.size() != versions.size()) {
+            fetchDataPackageFromAP(exclusions);
+        }
+    }
+
+    private void fetchDataPackageFromAP(Set<String> exclusions) {
+        sendPacket(new GetDataPackagePacket(exclusions));
     }
 
     public void sendPacket(APPacket packet) {

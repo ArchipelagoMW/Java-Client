@@ -5,6 +5,8 @@ import gg.archipelago.APClient.APWebSocket;
 import gg.archipelago.APClient.DataManager;
 import gg.archipelago.APClient.network.LocationChecks;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +38,7 @@ public class LocationManager {
 
     }
 
-    public void sendIfChecked(int[] missingChecks) {
+    public void sendIfChecked(Set<Integer> missingChecks) {
         LocationChecks packet = new LocationChecks();
         packet.locations = new HashSet<>();
         for (int missingCheck : missingChecks) {
@@ -62,5 +64,9 @@ public class LocationManager {
 
     public Set<Integer> getCheckedLocations() {
         return checkedLocations;
+    }
+
+    public void addCheckedLocations(Set<Integer> newLocations) {
+        this.checkedLocations.addAll(newLocations);
     }
 }

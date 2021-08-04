@@ -5,25 +5,27 @@ import com.google.gson.JsonElement;
 import com.google.gson.internal.Primitives;
 import gg.archipelago.APClient.network.ConnectionResult;
 
-public class ConnectionResultEvent {
+public class ConnectionAttemptEvent {
 
+    private boolean canceled = false;
     private final int team;
     private final int slot;
     private final String seedName;
-    private final ConnectionResult result;
     private final JsonElement slot_data;
 
-
-    public ConnectionResultEvent(ConnectionResult result) {
-        this(result,0,0,null,null);
-    }
-
-    public ConnectionResultEvent(ConnectionResult result, int team, int slot, String seedName, JsonElement slot_data) {
-        this.result = result;
+    public ConnectionAttemptEvent(int team, int slot, String seedName, JsonElement slotData) {
         this.team = team;
         this.slot = slot;
         this.seedName = seedName;
-        this.slot_data = slot_data;
+        this.slot_data = slotData;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public boolean isCanceled() {
+        return canceled;
     }
 
     public int getTeam() {
@@ -38,12 +40,9 @@ public class ConnectionResultEvent {
         return seedName;
     }
 
-    public ConnectionResult getResult() {
-        return result;
-    }
-
     public <T> T getSlotData(Class<T> classOfT) {
         Object data = new Gson().fromJson(slot_data,classOfT);
         return Primitives.wrap(classOfT).cast(data);
     }
+
 }

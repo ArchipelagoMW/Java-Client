@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import gg.archipelago.APClient.parts.NetworkPlayer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class ConnectedPacket extends APPacket {
 
@@ -14,7 +15,7 @@ public class ConnectedPacket extends APPacket {
     @SerializedName("players")
     public ArrayList<NetworkPlayer> players;
     @SerializedName("missing_locations")
-    public int[] missingLocations = new int[]{};
+    public HashSet<Integer> missingLocations = new HashSet<>();
     @SerializedName("checked_locations")
-    public int[] checkedLocations = new int[]{};
+    public HashSet<Integer> checkedLocations = new HashSet<>();
 }

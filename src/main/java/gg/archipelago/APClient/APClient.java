@@ -1,6 +1,7 @@
 package gg.archipelago.APClient;
 
 import gg.archipelago.APClient.Print.APPrint;
+import gg.archipelago.APClient.events.ConnectionAttemptEvent;
 import gg.archipelago.APClient.events.ConnectionResultEvent;
 import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
@@ -263,11 +264,18 @@ public abstract class APClient {
     }
 
     public void sendBounce(BouncePacket bouncePacket) {
-        apWebSocket.sendBouncePacket(bouncePacket);
+        if(apWebSocket != null && apWebSocket.isAuthenticated()) {
+            apWebSocket.sendBouncePacket(bouncePacket);
+        }
+    }
+
+    public void disconnect() {
+        apWebSocket.close();
     }
 
     public String[] getTags() {
         return tags;
     }
 
+    public abstract void onAttemptConnection(ConnectionAttemptEvent event);
 }

@@ -63,4 +63,8 @@ public class BouncedPacket extends APPacket {
     public boolean getBoolean(String key) {
         return (boolean)data.get(key);
     }
+
+    public boolean containsKey(String key) {
+        return data.containsKey(key);
+    }
 }
