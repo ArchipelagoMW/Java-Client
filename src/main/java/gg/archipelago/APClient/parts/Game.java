@@ -7,9 +7,6 @@ import java.util.HashMap;
 
 public class Game implements Serializable {
 
-    @SerializedName("Name")
-    String Name;
-
     @SerializedName("version")
     int version;
 

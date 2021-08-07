@@ -7,6 +7,7 @@ import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
 import gg.archipelago.APClient.network.*;
 import gg.archipelago.APClient.parts.DataPackage;
+import gg.archipelago.APClient.parts.Game;
 import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.Version;
 
@@ -20,7 +21,7 @@ public abstract class APClient {
 
     private final static Logger LOGGER = Logger.getLogger(APClient.class.getName());
 
-    private final String dataPackageLocation = "./APData/DataPackage.db";
+    private final String dataPackageLocation = "./APData/DataPackage.ser";
 
     private int hintPoints;
 
@@ -38,7 +39,7 @@ public abstract class APClient {
     private final ItemManager itemManager;
     private final DataManager dataManager;
 
-    public static final Version protocolVersion = new Version(0,1,5);
+    public static final Version protocolVersion = new Version(0,1,6);
 
     private int team;
     private int slot;
@@ -142,8 +143,8 @@ public abstract class APClient {
         this.roomInfo = roomInfo;
     }
 
-    protected void setDataPackage(DataPackage dataPackage) {
-        this.dataPackage = dataPackage;
+    protected void updateDataPackage(DataPackage newData) {
+        dataPackage.update(newData);
     }
 
     public int getTeam() {
