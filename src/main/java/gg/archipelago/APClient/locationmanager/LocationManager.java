@@ -68,5 +68,6 @@ public class LocationManager {
 
     public void addCheckedLocations(Set<Integer> newLocations) {
         this.checkedLocations.addAll(newLocations);
+        apClient.getDataManager().save();
     }
 }
