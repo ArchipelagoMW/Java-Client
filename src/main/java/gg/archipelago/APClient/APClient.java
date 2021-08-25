@@ -43,12 +43,12 @@ public abstract class APClient {
 
     private int team;
     private int slot;
-    private String name;
-    private String game;
+    private String name = "Name not set";
+    private String game = "Game not set";
     private String alias;
-    private String[] tags;
+    private String[] tags = {};
 
-    protected APClient(String saveID, int slotID) {
+    public APClient(String saveID, int slotID) {
         loadDataPackage();
 
         UUID = dataPackage.getUUID();
@@ -123,7 +123,7 @@ public abstract class APClient {
         this.password = password;
     }
 
-    protected void setHintPoints(int hintPoints) {
+    void setHintPoints(int hintPoints) {
         this.hintPoints = hintPoints;
     }
 
@@ -131,19 +131,19 @@ public abstract class APClient {
         this.name = name;
     }
 
-    protected void setSlot(int slot) {
+    void setSlot(int slot) {
         this.slot = slot;
     }
 
-    protected void setTeam(int team) {
+    void setTeam(int team) {
         this.team = team;
     }
 
-    protected void setRoomInfo(RoomInfoPacket roomInfo) {
+    void setRoomInfo(RoomInfoPacket roomInfo) {
         this.roomInfo = roomInfo;
     }
 
-    protected void updateDataPackage(DataPackage newData) {
+    void updateDataPackage(DataPackage newData) {
         dataPackage.update(newData);
     }
 
@@ -240,7 +240,7 @@ public abstract class APClient {
         return alias;
     }
 
-    protected void setAlias(String alias) {
+    void setAlias(String alias) {
         this.alias = alias;
     }
 
