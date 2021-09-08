@@ -7,12 +7,12 @@ import gg.archipelago.APClient.itemmanager.ItemManager;
 import gg.archipelago.APClient.locationmanager.LocationManager;
 import gg.archipelago.APClient.network.*;
 import gg.archipelago.APClient.parts.DataPackage;
-import gg.archipelago.APClient.parts.Game;
 import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.Version;
 
 import java.io.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -185,8 +185,12 @@ public abstract class APClient {
         }
     }
 
-    public boolean checkLocation(int advancementID) {
-        return locationManager.checkLocation(advancementID);
+    public boolean checkLocation(int locationID) {
+        return locationManager.checkLocation(locationID);
+    }
+
+    public void scoutLocations(ArrayList<Integer> locationIDs) {
+        apWebSocket.scoutLocation(locationIDs);
     }
 
     public abstract void onConnectResult(ConnectionResultEvent event);
@@ -203,7 +207,9 @@ public abstract class APClient {
 
     public abstract void onClose(String Reason, int attemptingReconnect);
 
-    public abstract void onReceiveItem(int item, String location, String player);
+    public abstract void onReceiveItem(NetworkItem item);
+
+    public abstract void onLocationInfo(ArrayList<NetworkItem> item);
 
     public DataPackage getDataPackage() {
         return dataPackage;

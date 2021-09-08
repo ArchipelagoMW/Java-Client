@@ -32,10 +32,10 @@ public class ItemManager {
             int myTeam = apClient.getTeam();
             for (int i = this.index; i < receivedItems.size(); i++) {
                 NetworkItem item = receivedItems.get(i);
-                String location = dp.getLocation(item.locationID);
-                int itemID = item.itemID;
-                String sendingPlayer = apClient.getRoomInfo().getPlayer(myTeam,item.playerID).alias;
-                apClient.onReceiveItem(itemID,location,sendingPlayer);
+                item.itemName = dp.getItem(item.itemID);
+                item.locationName = dp.getLocation(item.locationID);
+                item.playerName = apClient.getRoomInfo().getPlayer(myTeam,item.playerID).alias;
+                apClient.onReceiveItem(item);
             }
 
             this.index = receivedItems.size();

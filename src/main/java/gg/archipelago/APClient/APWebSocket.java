@@ -10,6 +10,7 @@ import gg.archipelago.APClient.network.ConnectionResult;
 import gg.archipelago.APClient.network.*;
 import gg.archipelago.APClient.network.APPacketType;
 import gg.archipelago.APClient.parts.DataPackage;
+import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.NetworkPlayer;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -163,11 +164,19 @@ public class APWebSocket extends WebSocketClient {
             else if (cmd.cmd == APPacketType.ReceivedItems){
                 RecivedItems items = gson.fromJson(packet, RecivedItems.class);
                 ItemManager itemManager = apClient.getItemManager();
-
                 itemManager.receiveItems(items.items, items.index);
             }
             else if (cmd.cmd == APPacketType.Bounced) {
                 apClient.onBounced(gson.fromJson(packet, BouncedPacket.class));
+            }
+            else if (cmd.cmd == APPacketType.LocationInfo) {
+                LocationInfo locations = gson.fromJson(packet, LocationInfo.class);
+                for (NetworkItem item : locations.locations) {
+                    item.itemName = apClient.getDataPackage().getItem(item.itemID);
+                    item.locationName = apClient.getDataPackage().getLocation(item.locationID);
+                    item.playerName = apClient.getRoomInfo().getPlayer(apClient.getTeam(),item.playerID).alias;
+                }
+                apClient.onLocationInfo(locations.locations);
             }
         }
     }
@@ -269,5 +278,10 @@ public class APWebSocket extends WebSocketClient {
 
     public boolean isAuthenticated() {
         return authenticated;
+    }
+
+    public void scoutLocation(ArrayList<Integer> locationIDs) {
+        LocationScouts packet = new LocationScouts(locationIDs);
+        sendPacket(packet);
     }
 }

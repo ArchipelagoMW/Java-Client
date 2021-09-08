@@ -1,6 +1,7 @@
 package gg.archipelago.APClient.parts;
 
 import com.google.gson.annotations.SerializedName;
+import gg.archipelago.APClient.network.GetDataPackagePacket;
 
 public class NetworkItem {
 
@@ -13,4 +14,7 @@ public class NetworkItem {
     @SerializedName("player")
     public int playerID;
 
+    public String itemName;
+    public String locationName;
+    public String playerName;
 }
