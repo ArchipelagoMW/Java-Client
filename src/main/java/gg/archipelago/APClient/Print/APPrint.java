@@ -17,4 +17,7 @@ public class APPrint {
     @SerializedName("item")
     public NetworkItem item;
 
+    @SerializedName("found")
+    public boolean found;
+
 }

@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
-    implementation 'com.google.code.gson:gson:2.8.7'
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 task relocateShadowJar(type: ConfigureShadowRelocation) {

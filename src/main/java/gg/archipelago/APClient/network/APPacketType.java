@@ -38,5 +38,7 @@ public enum APPacketType {
     @SerializedName("Bounced")
     Bounced,
     @SerializedName("Sync")
-    Sync
+    Sync,
+    @SerializedName("ConnectUpdate")
+    ConnectUpdate
 }

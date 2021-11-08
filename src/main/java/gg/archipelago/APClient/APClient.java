@@ -13,6 +13,7 @@ import gg.archipelago.APClient.parts.Version;
 import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -64,7 +65,14 @@ public abstract class APClient {
     }
 
     public void setTags(String[] tags) {
-        this.tags = tags;
+        if(!Arrays.equals(this.tags,tags)) {
+            this.tags = tags;
+            if(isConnected()) {
+                ConnectUpdatePacket packet = new ConnectUpdatePacket();
+                packet.tags = this.tags;
+                apWebSocket.sendPacket(packet);
+            }
+        }
     }
 
     private void loadDataPackage() {
