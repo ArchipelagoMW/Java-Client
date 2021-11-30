@@ -17,7 +17,7 @@ public class BouncedPacket extends APPacket {
     public HashSet<String> tags = new HashSet<>();
 
     @SerializedName("data")
-    private final HashMap<String, Object> data = new HashMap<>();
+    private final HashMap<String, String> data = new HashMap<>();
 
     public BouncedPacket() {
         super();
@@ -25,23 +25,23 @@ public class BouncedPacket extends APPacket {
     }
 
     public int getInt(String key) {
-        return (int)data.get(key);
+        return Integer.parseInt(data.get(key));
     }
 
     public float getFloat(String key) {
-        return (float)data.get(key);
+        return Float.parseFloat(data.get(key));
     }
 
     public double getDouble(String key) {
-        return (double)data.get(key);
+        return Double.parseDouble(data.get(key));
     }
 
     public String getString(String key) {
-        return (String)data.get(key);
+        return data.get(key);
     }
 
     public boolean getBoolean(String key) {
-        return (boolean)data.get(key);
+        return Boolean.parseBoolean(data.get(key));
     }
 
     public boolean containsKey(String key) {

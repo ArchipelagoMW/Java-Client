@@ -4,7 +4,7 @@ import gg.archipelago.APClient.Print.APPrintColor;
 import gg.archipelago.APClient.Print.APPrintType;
 
 public class APPrintPart {
-    public APPrintType type;
-    public APPrintColor color;
-    public String text;
+    public APPrintType type = APPrintType.text;
+    public APPrintColor color = APPrintColor.white;
+    public String text = "";
 }

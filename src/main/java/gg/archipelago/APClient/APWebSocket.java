@@ -197,7 +197,9 @@ public class APWebSocket extends WebSocketClient {
         HashSet<String> exclusions = new HashSet<>();
         for (Map.Entry<String, Integer> game : versions.entrySet()) {
             //the game does NOT need updating add it to the exclusion list.
-            if(Objects.equals(apClient.getDataPackage().getVersions().get(game.getKey()), game.getValue())) {
+            int myGameVersion = apClient.getDataPackage().getVersions().get(game.getKey());
+            int newGameVersion = game.getValue();
+            if( newGameVersion <= myGameVersion && newGameVersion != 0) {
                 exclusions.add(game.getKey());
             }
         }
