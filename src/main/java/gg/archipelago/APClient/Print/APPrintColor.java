@@ -4,6 +4,7 @@ package gg.archipelago.APClient.Print;
 import java.awt.*;
 
 public enum APPrintColor {
+    none,
     bold,
     underline,
     black(Color.black),
