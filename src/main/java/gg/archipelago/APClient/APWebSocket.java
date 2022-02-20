@@ -80,6 +80,7 @@ public class APWebSocket extends WebSocketClient {
                     connectPacket.uuid = apClient.getUUID();
                     connectPacket.game = apClient.getGame();
                     connectPacket.tags = apClient.getTags();
+                    connectPacket.itemsHandling = apClient.getItemsHandlingFlags();
 
                     //send reply
                     sendPacket(connectPacket);

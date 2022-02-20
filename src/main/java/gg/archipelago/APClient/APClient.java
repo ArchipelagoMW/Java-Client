@@ -48,6 +48,7 @@ public abstract class APClient {
     private String game = "Game not set";
     private String alias;
     private String[] tags = {};
+    private int itemsHandlingFlags = 0b000;
 
     public APClient(String saveID, int slotID) {
         loadDataPackage();
@@ -293,4 +294,12 @@ public abstract class APClient {
     }
 
     public abstract void onAttemptConnection(ConnectionAttemptEvent event);
+
+    public int getItemsHandlingFlags() {
+        return itemsHandlingFlags;
+    }
+
+    public void setItemsHandlingFlags(int itemsHandlingFlags) {
+        this.itemsHandlingFlags = itemsHandlingFlags;
+    }
 }
