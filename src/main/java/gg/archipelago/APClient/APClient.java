@@ -220,6 +220,8 @@ public abstract class APClient {
 
     public abstract void onLocationInfo(ArrayList<NetworkItem> item);
 
+    public abstract void onLocationChecked(int locationID);
+
     public DataPackage getDataPackage() {
         return dataPackage;
     }

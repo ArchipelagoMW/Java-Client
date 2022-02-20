@@ -187,6 +187,12 @@ public class APWebSocket extends WebSocketClient {
 
         apClient.setHintPoints(updateRoomPacket.hintPoints);
         apClient.setAlias(apClient.getRoomInfo().getPlayer(apClient.getTeam(), apClient.getSlot()).alias);
+
+        for (int location : updateRoomPacket.checkedLocations) {
+            if(apClient.getLocationManager().getCheckedLocations().contains(location))
+                continue;
+            apClient.onLocationChecked(location);
+        }
     }
 
     private void checkDataPackage(HashMap<String,Integer> versions) {
