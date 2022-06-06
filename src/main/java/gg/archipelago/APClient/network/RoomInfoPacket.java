@@ -30,8 +30,6 @@ public class RoomInfoPacket extends APPacket {
     @SerializedName("players")
     public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();
 
-    @SerializedName("datapackage_version")
-    public int datapackageVersion = -1;
 
     @SerializedName("datapackage_versions")
     public HashMap<String, Integer> datapackageVersions = new HashMap<>();
