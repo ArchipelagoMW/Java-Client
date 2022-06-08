@@ -189,6 +189,8 @@ public abstract class APClient {
     }
 
     public void sendChat(String message) {
+        if(apWebSocket == null)
+            return;
         if(apWebSocket.isAuthenticated()) {
             apWebSocket.sendChat(message);
         }
@@ -274,6 +276,8 @@ public abstract class APClient {
     }
 
     public void setGameState(ClientStatus status) {
+        if(apWebSocket == null)
+            return;
         if(apWebSocket.isAuthenticated())
             apWebSocket.sendPacket(new ClientStatusPacket(status));
     }
@@ -283,6 +287,8 @@ public abstract class APClient {
     }
 
     public void sendBounce(BouncePacket bouncePacket) {
+        if(apWebSocket == null)
+            return;
         if(apWebSocket.isAuthenticated())
             apWebSocket.sendPacket(bouncePacket);
     }

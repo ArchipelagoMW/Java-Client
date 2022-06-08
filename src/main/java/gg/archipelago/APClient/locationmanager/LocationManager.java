@@ -26,7 +26,10 @@ public class LocationManager {
         apClient.getDataManager().save();
         LocationChecks packet = new LocationChecks();
         packet.locations.add(id);
-        if(webSocket != null && webSocket.isAuthenticated()) {
+        if(webSocket == null)
+            return false;
+
+        if(webSocket.isAuthenticated()) {
             webSocket.sendPacket(packet);
             return true;
         }
