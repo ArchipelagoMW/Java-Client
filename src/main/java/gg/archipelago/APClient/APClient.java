@@ -196,11 +196,11 @@ public abstract class APClient {
         }
     }
 
-    public boolean checkLocation(int locationID) {
+    public boolean checkLocation(long locationID) {
         return locationManager.checkLocation(locationID);
     }
 
-    public void scoutLocations(ArrayList<Integer> locationIDs) {
+    public void scoutLocations(ArrayList<Long> locationIDs) {
         apWebSocket.scoutLocation(locationIDs);
     }
 
@@ -222,7 +222,11 @@ public abstract class APClient {
 
     public abstract void onLocationInfo(ArrayList<NetworkItem> item);
 
-    public abstract void onLocationChecked(int locationID);
+    /***
+     * called when the Archipelago server checks a location for you, such as during co-op or during a !collect
+     * @param locationID
+     */
+    public abstract void onLocationChecked(long locationID);
 
     public DataPackage getDataPackage() {
         return dataPackage;

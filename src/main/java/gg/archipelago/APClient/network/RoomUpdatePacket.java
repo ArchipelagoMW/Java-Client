@@ -34,10 +34,10 @@ public class RoomUpdatePacket extends APPacket {
     public int locationCheckPoints;
 
     @SerializedName("checked_locations")
-    public ArrayList<Integer> checkedLocations = new ArrayList<>();
+    public ArrayList<Long> checkedLocations = new ArrayList<>();
 
     @SerializedName("missing_locations")
-    public ArrayList<Integer> missingLocations = new ArrayList<>();
+    public ArrayList<Long> missingLocations = new ArrayList<>();
 
     @SerializedName("players")
     public ArrayList<NetworkPlayer> networkPlayers = new ArrayList<>();

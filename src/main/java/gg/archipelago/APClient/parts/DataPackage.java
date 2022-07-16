@@ -16,15 +16,15 @@ public class DataPackage implements Serializable {
     @SerializedName("version")
     int version = -1;
 
-    HashMap<Integer, String> itemIdToName = new HashMap<>();
+    HashMap<Long, String> itemIdToName = new HashMap<>();
 
-    HashMap<Integer, String> locationIdToName = new HashMap<>();
+    HashMap<Long, String> locationIdToName = new HashMap<>();
 
     public String uuid = UUID.randomUUID().toString();
 
-    public String getItem(int itemID) {
+    public String getItem(long itemID) {
         for (Map.Entry<String, Game> game : games.entrySet()) {
-            for (Map.Entry<String, Integer> item : game.getValue().itemNameToId.entrySet()) {
+            for (Map.Entry<String, Long> item : game.getValue().itemNameToId.entrySet()) {
                 if(item.getValue() == itemID)
                     return item.getKey();
             }
@@ -32,11 +32,11 @@ public class DataPackage implements Serializable {
         return String.format("Unknown Item [%d]", itemID);
     }
 
-    public String getLocation(int locationID) {
+    public String getLocation(long locationID) {
         if(locationIdToName.containsKey(locationID))
             return locationIdToName.get(locationID);
         for (Map.Entry<String, Game> game : games.entrySet()) {
-            for (Map.Entry<String, Integer> location : game.getValue().locationNameToId.entrySet()) {
+            for (Map.Entry<String, Long> location : game.getValue().locationNameToId.entrySet()) {
                 if(location.getValue() == locationID) {
                     locationIdToName.put(locationID, location.getKey());
                     return location.getKey();
@@ -56,10 +56,10 @@ public class DataPackage implements Serializable {
         return games;
     }
 
-    public HashMap<Integer, String> getItems() {
+    public HashMap<Long, String> getItems() {
         if(itemIdToName.isEmpty()) {
             for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-                for (Map.Entry<String, Integer> items : gameEntry.getValue().itemNameToId.entrySet()) {
+                for (Map.Entry<String, Long> items : gameEntry.getValue().itemNameToId.entrySet()) {
                     itemIdToName.put(items.getValue(), items.getKey());
                 }
             }
@@ -67,10 +67,10 @@ public class DataPackage implements Serializable {
         return itemIdToName;
     }
 
-    public HashMap<Integer, String> getLocations() {
+    public HashMap<Long, String> getLocations() {
         if(locationIdToName.isEmpty()) {
             for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-                for (Map.Entry<String, Integer> items : gameEntry.getValue().locationNameToId.entrySet()) {
+                for (Map.Entry<String, Long> items : gameEntry.getValue().locationNameToId.entrySet()) {
                     itemIdToName.put(items.getValue(), items.getKey());
                 }
             }

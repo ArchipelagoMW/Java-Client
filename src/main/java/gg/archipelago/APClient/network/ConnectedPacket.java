@@ -15,7 +15,7 @@ public class ConnectedPacket extends APPacket {
     @SerializedName("players")
     public ArrayList<NetworkPlayer> players;
     @SerializedName("missing_locations")
-    public HashSet<Integer> missingLocations = new HashSet<>();
+    public HashSet<Long> missingLocations = new HashSet<>();
     @SerializedName("checked_locations")
-    public HashSet<Integer> checkedLocations = new HashSet<>();
+    public HashSet<Long> checkedLocations = new HashSet<>();
 }

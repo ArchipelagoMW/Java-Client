@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class RecivedItems extends APPacket {
 
     @SerializedName("index")
-    public int index;
+    public long index;
 
     @SerializedName("items")
     public ArrayList<NetworkItem> items;

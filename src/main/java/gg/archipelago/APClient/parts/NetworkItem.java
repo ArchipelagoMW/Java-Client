@@ -6,10 +6,10 @@ import gg.archipelago.APClient.network.GetDataPackagePacket;
 public class NetworkItem {
 
     @SerializedName("item")
-    public int itemID;
+    public long itemID;
 
     @SerializedName("location")
-    public int locationID;
+    public long locationID;
 
     @SerializedName("player")
     public int playerID;

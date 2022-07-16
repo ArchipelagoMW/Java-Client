@@ -11,7 +11,7 @@ import java.util.Set;
 public class SaveData {
 
     @SerializedName("locations")
-    public Set<Integer> checkedLocations = new HashSet<>();
+    public Set<Long> checkedLocations = new HashSet<>();
 
     @SerializedName("items")
     public ArrayList<NetworkItem> receivedItems = new ArrayList<>();

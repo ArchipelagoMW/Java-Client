@@ -22,7 +22,7 @@ public class ItemManager {
         this.apClient = apClient;
     }
 
-    public void receiveItems(ArrayList<NetworkItem> ids, int index) {
+    public void receiveItems(ArrayList<NetworkItem> ids, long index) {
         if (index == 0) {
             receivedItems = new ArrayList<>();
         }
@@ -66,8 +66,8 @@ public class ItemManager {
         return receivedItems;
     }
 
-    public ArrayList<Integer> getReceivedItemIDs() {
-        ArrayList<Integer> ids = new ArrayList<>();
+    public ArrayList<Long> getReceivedItemIDs() {
+        ArrayList<Long> ids = new ArrayList<>();
         for (NetworkItem receivedItem : receivedItems) {
             ids.add(receivedItem.itemID);
         }

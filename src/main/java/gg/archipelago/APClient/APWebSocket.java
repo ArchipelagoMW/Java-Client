@@ -188,7 +188,7 @@ public class APWebSocket extends WebSocketClient {
         apClient.setHintPoints(updateRoomPacket.hintPoints);
         apClient.setAlias(apClient.getRoomInfo().getPlayer(apClient.getTeam(), apClient.getSlot()).alias);
 
-        for (int location : updateRoomPacket.checkedLocations) {
+        for (long location : updateRoomPacket.checkedLocations) {
             if(apClient.getLocationManager().getCheckedLocations().contains(location))
                 continue;
             apClient.onLocationChecked(location);
@@ -284,7 +284,7 @@ public class APWebSocket extends WebSocketClient {
         return authenticated;
     }
 
-    public void scoutLocation(ArrayList<Integer> locationIDs) {
+    public void scoutLocation(ArrayList<Long> locationIDs) {
         LocationScouts packet = new LocationScouts(locationIDs);
         sendPacket(packet);
     }

@@ -15,13 +15,13 @@ public class LocationManager {
     APClient apClient;
     APWebSocket webSocket;
 
-    Set<Integer> checkedLocations = new HashSet<>();
+    Set<Long> checkedLocations = new HashSet<>();
 
     public LocationManager(APClient apClient) {
         this.apClient = apClient;
     }
 
-    public boolean checkLocation(int id) {
+    public boolean checkLocation(long id) {
         checkedLocations.add(id);
         apClient.getDataManager().save();
         LocationChecks packet = new LocationChecks();
@@ -36,15 +36,15 @@ public class LocationManager {
         return false;
     }
 
-    public void writeFromSave(Set<Integer> checkedLocations) {
+    public void writeFromSave(Set<Long> checkedLocations) {
         this.checkedLocations = checkedLocations;
 
     }
 
-    public void sendIfChecked(Set<Integer> missingChecks) {
+    public void sendIfChecked(Set<Long> missingChecks) {
         LocationChecks packet = new LocationChecks();
         packet.locations = new HashSet<>();
-        for (int missingCheck : missingChecks) {
+        for (Long missingCheck : missingChecks) {
             if(checkedLocations.contains(missingCheck)) {
                 packet.locations.add(missingCheck);
             }
@@ -65,11 +65,11 @@ public class LocationManager {
         this.webSocket = apWebSocket;
     }
 
-    public Set<Integer> getCheckedLocations() {
+    public Set<Long> getCheckedLocations() {
         return checkedLocations;
     }
 
-    public void addCheckedLocations(Set<Integer> newLocations) {
+    public void addCheckedLocations(Set<Long> newLocations) {
         this.checkedLocations.addAll(newLocations);
         apClient.getDataManager().save();
     }
