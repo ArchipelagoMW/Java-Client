@@ -2,6 +2,5 @@
 /.gradle/
 /build/
 /build/classes/java/main/
-/gradle/
 /.idea/
 gradle.properties
