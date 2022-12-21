@@ -12,10 +12,12 @@ import gg.archipelago.APClient.network.APPacketType;
 import gg.archipelago.APClient.parts.DataPackage;
 import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.NetworkPlayer;
+import org.apache.hc.core5.net.URIBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -31,17 +33,17 @@ public class APWebSocket extends WebSocketClient {
 
     private int reconnectAttempt = 0;
 
-    private boolean attemptingReconnect;
-
     private String seedName;
     private static Timer reconnectTimer;
+    private boolean downgrade = false;
 
     public APWebSocket(URI serverUri, APClient apClient) {
         super(serverUri);
         this.apClient = apClient;
-        if (reconnectTimer == null)
-            reconnectTimer = new Timer();
-        reconnectTimer.cancel();
+        if (reconnectTimer != null) {
+            reconnectTimer.cancel();
+        }
+        reconnectTimer = new Timer();
     }
 
     @Override
@@ -228,51 +230,63 @@ public class APWebSocket extends WebSocketClient {
     @Override
     public void onClose(int code, String wsReason, boolean remote) {
         LOGGER.fine(String.format("Connection closed by %s Code: %s Reason: %s", (remote ? "remote peer" : "us"), code, wsReason));
-        authenticated = false;
-        attemptingReconnect = false;
-        String reason = wsReason;
-        if (code == -1)
-            reason = "Connection refused by the Archipelago server.";
+        String reason = (wsReason.isEmpty()) ? "Connection refused by the Archipelago server." : wsReason;
+        if (code == -1) {
+            reconnectTimer.cancel();
+
+            // attempt to reconnect using non-secure web socket if we are failing to connect with a secure socket.
+            if (uri.getScheme().equalsIgnoreCase("wss") && downgrade) {
+                try {
+                    apClient.connect(new URIBuilder(uri).setScheme("ws").build());
+                } catch (URISyntaxException ignored) {
+                    apClient.onClose(reason, 0);
+                }
+                return;
+            }
+            apClient.onClose(reason, 0);
+            return;
+        }
+        if(code == 1000) {
+            reconnectTimer.cancel();
+            apClient.onClose("Disconnected.", 0);
+        }
+
         if (code == 1006) {
             reason = "Lost connection to the Archipelago server.";
-            attemptingReconnect = true;
+            if( reconnectAttempt <= 10) {
+                int reconnectDelay = (int) (5000 * Math.pow(2, reconnectAttempt));
+                reconnectAttempt++;
+                TimerTask reconnectTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        apClient.reconnect();
+                    }
+                };
+
+                reconnectTimer.cancel();
+                reconnectTimer = new Timer();
+                reconnectTimer.schedule(reconnectTask, reconnectDelay);
+                apClient.onClose(reason, reconnectDelay / 1000);
+                return;
+            }
         }
 
-        if(attemptingReconnect && reconnectAttempt <= 10) {
-            int reconnectDelay = (int) (5000 * Math.pow(2,reconnectAttempt));
-            reconnectAttempt++;
-            apClient.onClose(reason, reconnectDelay/1000);
-
-            TimerTask reconnectTask = new TimerTask() {
-                @Override
-                public void run() {
-                    apClient.reconnect();
-                }
-            };
-
-            reconnectTimer.cancel();
-            reconnectTimer = new Timer();
-            reconnectTimer.schedule(reconnectTask, reconnectDelay);
-        }
-        else {
-            attemptingReconnect = false;
-            reconnectTimer.cancel();
-            apClient.onClose(reason, 0);
-        }
+        reconnectTimer.cancel();
+        apClient.onClose(reason, 0);
     }
 
     @Override
     public void onError(Exception ex) {
-        //apClient.onError(ex);
+        apClient.onError(ex);
         LOGGER.log(Level.WARNING, "Error in websocket connection");
+        ex.printStackTrace();
     }
 
-    @Override
-    public void connect(){
+    public void connect(boolean allowDowngrade){
         super.connect();
         reconnectTimer.cancel();
-        attemptingReconnect = false;
         reconnectAttempt = 0;
+        this.downgrade = allowDowngrade;
     }
 
     public void sendChat(String message) {

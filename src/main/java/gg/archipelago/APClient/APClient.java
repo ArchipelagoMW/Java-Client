@@ -9,14 +9,15 @@ import gg.archipelago.APClient.network.*;
 import gg.archipelago.APClient.parts.DataPackage;
 import gg.archipelago.APClient.parts.NetworkItem;
 import gg.archipelago.APClient.parts.Version;
+import org.apache.hc.core5.net.URIBuilder;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 public abstract class APClient {
 
@@ -168,24 +169,36 @@ public abstract class APClient {
         return roomInfo;
     }
 
-    public void connect(String address) {
-        LOGGER.fine("attempting WebSocket connection to " + address);
+    public void connect(String address) throws URISyntaxException {
+        URIBuilder builder = new URIBuilder((!address.contains("//")) ? "//" + address : address);
+        if (builder.getPort() == -1) { //set default port if not included
+            builder.setPort(38281);
+        }
+
         if (apWebSocket != null && apWebSocket.isOpen()) {
             LOGGER.fine("previous WebSocket is open, closing.");
             apWebSocket.close();
         }
-        //regex match port on end of address
-        String pattern = ":[0-9]+";
-        Pattern p = Pattern.compile(pattern);
-        if(!p.matcher(address).find()) {
-            LOGGER.fine("no port set assuming default of 38281");
-            address += ":38281";
+
+        if (builder.getScheme() == null) {
+            builder.setScheme("wss");
+            connect(builder.build(), true);
+            return;
         }
-        URI uri = URI.create("ws://" + address);
-        apWebSocket = new APWebSocket(uri, this);
+
+        connect(builder.build());
+    }
+
+    public void connect(URI address) {
+        connect(address, false);
+    }
+
+    public void connect(URI address, boolean allowDowngrade) {
+        LOGGER.fine("attempting WebSocket connection to " + address.toString());
+        apWebSocket = new APWebSocket(address, this);
         locationManager.setAPWebSocket(apWebSocket);
         itemManager.setAPWebSocket(apWebSocket);
-        apWebSocket.connect();
+        apWebSocket.connect(allowDowngrade);
     }
 
     public void sendChat(String message) {
