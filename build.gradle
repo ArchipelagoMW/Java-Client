@@ -7,7 +7,7 @@ plugins {
 
 archivesBaseName = "Archipelago.MultiClient.Java"
 group = 'gg.archipelago.APClient'
-version = '1.6'
+version = '1.7'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 

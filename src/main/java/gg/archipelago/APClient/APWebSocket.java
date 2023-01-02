@@ -16,6 +16,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import javax.net.ssl.SSLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -277,6 +278,7 @@ public class APWebSocket extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
+        if(ex instanceof SSLException) return;
         apClient.onError(ex);
         LOGGER.log(Level.WARNING, "Error in websocket connection");
         ex.printStackTrace();
