@@ -7,6 +7,13 @@ public class APPacket {
 
     @Expose
     @SerializedName("cmd")
-    public APPacketType cmd;
+    private APPacketType cmd;
 
+    public APPacket(APPacketType cmd) {
+        this.cmd = cmd;
+    }
+
+    public APPacketType getCmd() {
+        return cmd;
+    }
 }

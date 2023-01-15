@@ -10,7 +10,7 @@ public class LocationScouts extends APPacket {
     public ArrayList<Long> locations = new ArrayList<>();
 
     public LocationScouts(ArrayList<Long> locations) {
-        this.cmd = APPacketType.LocationScouts;
+        super(APPacketType.LocationScouts);
         this.locations = locations;
     }
 }

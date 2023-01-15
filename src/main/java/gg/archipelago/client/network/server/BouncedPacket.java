@@ -22,7 +22,6 @@ public class BouncedPacket extends APPacket {
     public final HashMap<String, Object> data = new HashMap<>();
 
     public BouncedPacket() {
-        super();
-        this.cmd = APPacketType.Bounced;
+        super(APPacketType.Bounced);
     }
 }

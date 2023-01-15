@@ -31,7 +31,7 @@ public class ConnectPacket extends APPacket {
     public Set<String> tags;
 
     public ConnectPacket() {
-        cmd = APPacketType.Connect;
+        super(APPacketType.Connect);
     }
 
 }

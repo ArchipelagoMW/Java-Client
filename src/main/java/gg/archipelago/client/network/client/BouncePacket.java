@@ -27,8 +27,7 @@ public class BouncePacket extends APPacket implements Event {
     private HashMap<String, Object> data;
 
     public BouncePacket() {
-        super();
-        this.cmd = APPacketType.Bounce;
+        super(APPacketType.Bounce);
     }
 
     public HashMap<String, Object> getData() {

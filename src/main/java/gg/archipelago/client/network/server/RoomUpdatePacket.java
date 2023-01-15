@@ -2,6 +2,7 @@ package gg.archipelago.client.network.server;
 
 import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.network.APPacket;
+import gg.archipelago.client.network.APPacketType;
 import gg.archipelago.client.network.RemainingMode;
 import gg.archipelago.client.parts.NetworkPlayer;
 import gg.archipelago.client.parts.Version;
@@ -50,4 +51,7 @@ public class RoomUpdatePacket extends APPacket {
     @SerializedName("datapackage_versions")
     public HashMap<String, Integer> datapackageVersions = new HashMap<>();
 
+    public RoomUpdatePacket() {
+        super(APPacketType.RoomUpdate);
+    }
 }

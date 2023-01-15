@@ -10,7 +10,7 @@ public class SayPacket extends APPacket {
     String text;
 
     public SayPacket(String message) {
-        cmd = APPacketType.Say;
+        super(APPacketType.Say);
         text = message;
     }
 }

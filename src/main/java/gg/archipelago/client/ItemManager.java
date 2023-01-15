@@ -21,7 +21,7 @@ public class ItemManager {
         this.archipelagoClient = archipelagoClient;
     }
 
-    public void receiveItems(ArrayList<NetworkItem> ids, long index) {
+    public void receiveItems(ArrayList<NetworkItem> ids, int index) {
         if (index == 0) {
             receivedItems = new ArrayList<>();
         }
@@ -34,7 +34,7 @@ public class ItemManager {
                 item.itemName = dp.getItem(item.itemID);
                 item.locationName = dp.getLocation(item.locationID);
                 item.playerName = archipelagoClient.getRoomInfo().getPlayer(myTeam,item.playerID).alias;
-                archipelagoClient.getEventManager().callEvent(new ReceiveItemEvent(item));
+                archipelagoClient.getEventManager().callEvent(new ReceiveItemEvent(item, index));
             }
 
             this.index = receivedItems.size();

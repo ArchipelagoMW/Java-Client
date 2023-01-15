@@ -5,8 +5,10 @@ import gg.archipelago.client.parts.NetworkItem;
 public class ReceiveItemEvent implements Event {
 
     private final NetworkItem item;
-    public ReceiveItemEvent(NetworkItem item) {
+    private final int index;
+    public ReceiveItemEvent(NetworkItem item, int index) {
         this.item = item;
+        this.index = index;
     }
 
     public NetworkItem getItem() {
@@ -35,5 +37,9 @@ public class ReceiveItemEvent implements Event {
 
     public int getPlayerID() {
         return item.playerID;
+    }
+
+    public long getIndex() {
+        return index;
     }
 }

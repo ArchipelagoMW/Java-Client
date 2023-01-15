@@ -36,9 +36,10 @@ public class SetPacket extends APPacket {
 
 
     public SetPacket(String key, Object defaultValue) {
+        super(APPacketType.Set);
         this.key = key;
         this.defaultValue = defaultValue;
-        this.cmd = APPacketType.Set;
+
     }
 
     /**

@@ -2,6 +2,7 @@ package gg.archipelago.client.network.server;
 
 import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.network.APPacket;
+import gg.archipelago.client.network.APPacketType;
 import gg.archipelago.client.network.RemainingMode;
 import gg.archipelago.client.parts.NetworkPlayer;
 import gg.archipelago.client.parts.Version;
@@ -45,6 +46,10 @@ public class RoomInfoPacket extends APPacket {
 
     @SerializedName("permissions")
     public HashMap<String, Integer> permissions;
+
+    public RoomInfoPacket() {
+        super(APPacketType.RoomInfo);
+    }
 
     public NetworkPlayer getPlayer(int team, int slot) {
         for(NetworkPlayer player : networkPlayers) {

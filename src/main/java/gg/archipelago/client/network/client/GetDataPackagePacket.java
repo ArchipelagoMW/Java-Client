@@ -14,7 +14,7 @@ public class GetDataPackagePacket extends APPacket {
     }
 
     public GetDataPackagePacket(Set<String> exclusions) {
-        cmd = APPacketType.GetDataPackage;
+        super(APPacketType.GetDataPackage);
         this.exclusions = exclusions;
     }
 }

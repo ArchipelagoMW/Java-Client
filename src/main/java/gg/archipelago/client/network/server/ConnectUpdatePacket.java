@@ -12,7 +12,7 @@ public class ConnectUpdatePacket extends APPacket {
     public Set<String> tags;
 
     public ConnectUpdatePacket() {
-        cmd = APPacketType.ConnectUpdate;
+        super(APPacketType.ConnectUpdate);
     }
 
 }

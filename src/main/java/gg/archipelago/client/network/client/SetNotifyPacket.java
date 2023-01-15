@@ -12,7 +12,7 @@ public class SetNotifyPacket extends APPacket {
      */
     public ArrayList<String> keys;
     public SetNotifyPacket(ArrayList<String> keys) {
-        this.cmd = APPacketType.Set;
+        super(APPacketType.SetNotify);
         this.keys = keys;
     }
 }

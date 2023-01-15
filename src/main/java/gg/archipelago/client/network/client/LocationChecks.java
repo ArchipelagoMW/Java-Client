@@ -13,6 +13,6 @@ public class LocationChecks extends APPacket {
     public Set<Long> locations = new HashSet<>();
 
     public LocationChecks() {
-        this.cmd = APPacketType.LocationChecks;
+        super(APPacketType.LocationChecks);
     }
 }

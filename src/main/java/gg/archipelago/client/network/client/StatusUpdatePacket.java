@@ -9,9 +9,8 @@ public class StatusUpdatePacket extends APPacket {
     int status;
 
     public StatusUpdatePacket(ClientStatus status) {
-        super();
+        super(APPacketType.StatusUpdate);
         this.status = status.getValue();
-        this.cmd = APPacketType.StatusUpdate;
 
     }
 }

@@ -21,7 +21,7 @@ public class GetPacket extends APPacket {
 
 
     public GetPacket(Collection<String> keys) {
+        super(APPacketType.Get);
         this.keys = keys;
-        this.cmd = APPacketType.Get;
     }
 }

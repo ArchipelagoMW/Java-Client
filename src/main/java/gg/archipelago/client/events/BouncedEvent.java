@@ -27,7 +27,7 @@ public class BouncedEvent implements Event {
     }
 
     public int getInt(String key) {
-        return (Integer) data.get(key);
+        return ((Double)data.get(key)).intValue();
     }
 
     public float getFloat(String key) {
