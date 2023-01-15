@@ -45,7 +45,7 @@ public abstract class ArchipelagoClient {
     private final EventManager eventManager;
     private final DeathLink deathLink;
 
-    public static final Version protocolVersion = new Version(0,3,7);
+    public static final Version protocolVersion = new Version(0, 3, 7);
 
     private int team;
     private int slot;
@@ -72,9 +72,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void setTags(Set<String> tags) {
-        if(!this.tags.equals(tags)) {
+        if (!this.tags.equals(tags)) {
             this.tags = tags;
-            if(isConnected()) {
+            if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 archipelagoWebSocket.sendPacket(packet);
@@ -83,9 +83,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void addTag(String tag) {
-        if(!this.tags.contains(tag)) {
+        if (!this.tags.contains(tag)) {
             tags.add(tag);
-            if(isConnected()) {
+            if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 archipelagoWebSocket.sendPacket(packet);
@@ -94,9 +94,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void removeTag(String tag) {
-        if(this.tags.contains(tag)) {
+        if (this.tags.contains(tag)) {
             tags.remove(tag);
-            if(isConnected()) {
+            if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 archipelagoWebSocket.sendPacket(packet);
@@ -118,8 +118,7 @@ public abstract class ArchipelagoClient {
             LOGGER.info("no dataPackage found creating a new one.");
             dataPackage = new DataPackage();
             saveDataPackage();
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             LOGGER.warning("uhh ohh failed to absorb dataPackage.");
             dataPackage = new DataPackage();
         }
@@ -144,7 +143,7 @@ public abstract class ArchipelagoClient {
             objectOut.close();
 
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING,"unable to save DataPackage.",e);
+            LOGGER.log(Level.WARNING, "unable to save DataPackage.", e);
         }
     }
 
@@ -230,9 +229,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void sendChat(String message) {
-        if(archipelagoWebSocket == null)
+        if (archipelagoWebSocket == null)
             return;
-        if(archipelagoWebSocket.isAuthenticated()) {
+        if (archipelagoWebSocket.isAuthenticated()) {
             archipelagoWebSocket.sendChat(message);
         }
     }
@@ -240,6 +239,7 @@ public abstract class ArchipelagoClient {
     public boolean checkLocation(long locationID) {
         return locationManager.checkLocation(locationID);
     }
+
     public boolean checkLocations(Collection<Long> locationIDs) {
         return locationManager.checkLocations(locationIDs);
     }
@@ -304,9 +304,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void setGameState(ClientStatus status) {
-        if(archipelagoWebSocket == null)
+        if (archipelagoWebSocket == null)
             return;
-        if(archipelagoWebSocket.isAuthenticated())
+        if (archipelagoWebSocket.isAuthenticated())
             archipelagoWebSocket.sendPacket(new StatusUpdatePacket(status));
     }
 
@@ -315,9 +315,9 @@ public abstract class ArchipelagoClient {
     }
 
     public void sendBounce(BouncePacket bouncePacket) {
-        if(archipelagoWebSocket == null)
+        if (archipelagoWebSocket == null)
             return;
-        if(archipelagoWebSocket.isAuthenticated())
+        if (archipelagoWebSocket.isAuthenticated())
             archipelagoWebSocket.sendPacket(bouncePacket);
     }
 
@@ -343,24 +343,26 @@ public abstract class ArchipelagoClient {
 
     /**
      * Uses DataStorage to save a value on the AP server.
+     *
      * @param setPacket
      */
-    public void dataStorageSet(SetPacket setPacket) {
-        if(archipelagoWebSocket == null)
-            return;
-        if(archipelagoWebSocket.isAuthenticated())
-            archipelagoWebSocket.sendPacket(setPacket);
+    public int dataStorageSet(SetPacket setPacket) {
+        if (archipelagoWebSocket == null || !archipelagoWebSocket.isAuthenticated())
+            return 0;
+
+        archipelagoWebSocket.sendPacket(setPacket);
+        return setPacket.getRequestID();
     }
 
     /**
      * Registers to receive updates of when a key in the Datastorage has been changed on the server.
-     * @param keys
+     *
+     * @param keys List of Keys to be notified of.
      */
     public void dataStorageSetNotify(ArrayList<String> keys) {
-        if(archipelagoWebSocket == null)
+        if (archipelagoWebSocket == null || !archipelagoWebSocket.isAuthenticated())
             return;
-        if(archipelagoWebSocket.isAuthenticated())
-            archipelagoWebSocket.sendPacket(new SetNotifyPacket(keys));
+        archipelagoWebSocket.sendPacket(new SetNotifyPacket(keys));
     }
 
     /**
@@ -389,12 +391,15 @@ public abstract class ArchipelagoClient {
      *         <td> item_name_groups belonging to the requested game. </td>
      *     </tr>
      * </table>
+     *
      * @param keys a list of keys to retrieve values for
      */
-    public void dataStorageGet(Collection<String> keys) {
-        if(archipelagoWebSocket == null)
-            return;
-        if(archipelagoWebSocket.isAuthenticated())
-            archipelagoWebSocket.sendPacket(new GetPacket(keys));
+    public int dataStorageGet(Collection<String> keys) {
+        if (archipelagoWebSocket == null || !archipelagoWebSocket.isAuthenticated())
+            return 0;
+
+        GetPacket getPacket = new GetPacket(keys);
+        archipelagoWebSocket.sendPacket(getPacket);
+        return getPacket.getRequestID();
     }
 }

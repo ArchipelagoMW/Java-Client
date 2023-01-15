@@ -5,6 +5,7 @@ import gg.archipelago.client.network.APPacket;
 import gg.archipelago.client.network.APPacketType;
 
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * Used to request a single or multiple values from the server's data storage, see the
@@ -19,9 +20,16 @@ public class GetPacket extends APPacket {
     @SerializedName("keys")
     public Collection<String> keys;
 
+    @SerializedName("request_id")
+    private int requestID;
 
     public GetPacket(Collection<String> keys) {
         super(APPacketType.Get);
         this.keys = keys;
+        requestID = new Random().nextInt(Integer.MAX_VALUE);
+    }
+
+    public int getRequestID() {
+        return requestID;
     }
 }

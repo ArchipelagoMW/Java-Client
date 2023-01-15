@@ -5,8 +5,10 @@ import java.util.HashMap;
 public class RetrievedEvent implements Event {
 
     public HashMap<String, Object> data;
-    public RetrievedEvent(HashMap<String, Object> keys) {
+    private final int requestID;
+    public RetrievedEvent(HashMap<String, Object> keys , int requestID) {
         data = keys;
+        this.requestID = requestID;
     }
 
     public int getInt(String key) {
@@ -35,5 +37,9 @@ public class RetrievedEvent implements Event {
 
     public boolean containsKey(String key) {
         return data.containsKey(key);
+    }
+
+    public int getRequestID() {
+        return requestID;
     }
 }

@@ -11,6 +11,9 @@ public class RetrievedPacket  extends APPacket {
     @SerializedName("keys")
     public HashMap<String, Object> keys;
 
+    @SerializedName("request_id")
+    public int requestID;
+
     public RetrievedPacket() {
         super(APPacketType.Retrieved);
     }

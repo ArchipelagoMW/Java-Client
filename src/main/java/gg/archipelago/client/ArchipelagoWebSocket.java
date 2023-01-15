@@ -191,11 +191,11 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                         break;
                     case Retrieved:
                         RetrievedPacket retrievedPacket = gson.fromJson(packet, RetrievedPacket.class);
-                        archipelagoClient.getEventManager().callEvent(new RetrievedEvent(retrievedPacket.keys));
+                        archipelagoClient.getEventManager().callEvent(new RetrievedEvent(retrievedPacket.keys, retrievedPacket.requestID));
                         break;
                     case SetReply:
                         SetReplyPacket setReplyPacket = gson.fromJson(packet, SetReplyPacket.class);
-                        archipelagoClient.getEventManager().callEvent(new SetReplyEvent(setReplyPacket.key, setReplyPacket.value, setReplyPacket.original_Value));
+                        archipelagoClient.getEventManager().callEvent(new SetReplyEvent(setReplyPacket.key, setReplyPacket.value, setReplyPacket.original_Value, packet.getAsJsonObject().get("value"), setReplyPacket.requestID));
                         break;
                 }
             }

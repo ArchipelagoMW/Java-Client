@@ -1,10 +1,12 @@
 package gg.archipelago.client.network.client;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.network.APPacket;
 import gg.archipelago.client.network.APPacketType;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SetPacket extends APPacket {
 
@@ -34,12 +36,14 @@ public class SetPacket extends APPacket {
     @SerializedName("operations")
     public ArrayList<DataStorageOperation> operations = new ArrayList<>();
 
+    @SerializedName("request_id")
+    private int requestID;
 
     public SetPacket(String key, Object defaultValue) {
         super(APPacketType.Set);
         this.key = key;
         this.defaultValue = defaultValue;
-
+        requestID = new Random().nextInt(Integer.MAX_VALUE);
     }
 
     /**
@@ -50,6 +54,10 @@ public class SetPacket extends APPacket {
      */
     public void addDataStorageOperation(Operation operation, Object value) {
         operations.add(new DataStorageOperation(operation, value));
+    }
+
+    public int getRequestID() {
+        return requestID;
     }
 
     /**
