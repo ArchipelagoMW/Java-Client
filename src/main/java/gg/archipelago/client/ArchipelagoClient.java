@@ -359,7 +359,7 @@ public abstract class ArchipelagoClient {
      *
      * @param keys List of Keys to be notified of.
      */
-    public void dataStorageSetNotify(ArrayList<String> keys) {
+    public void dataStorageSetNotify(Collection<String> keys) {
         if (archipelagoWebSocket == null || !archipelagoWebSocket.isAuthenticated())
             return;
         archipelagoWebSocket.sendPacket(new SetNotifyPacket(keys));

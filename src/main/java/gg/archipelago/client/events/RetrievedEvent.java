@@ -1,13 +1,22 @@
 package gg.archipelago.client.events;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.internal.Primitives;
+import com.google.gson.internal.bind.JsonTreeReader;
+
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 public class RetrievedEvent implements Event {
 
     public HashMap<String, Object> data;
     private final int requestID;
-    public RetrievedEvent(HashMap<String, Object> keys , int requestID) {
+    private final JsonObject jsonValue;
+
+    public RetrievedEvent(HashMap<String, Object> keys, JsonObject jsonValue, int requestID) {
         data = keys;
+        this.jsonValue = jsonValue;
         this.requestID = requestID;
     }
 
@@ -24,11 +33,11 @@ public class RetrievedEvent implements Event {
     }
 
     public String getString(String key) {
-        return (String)data.get(key);
+        return (String) data.get(key);
     }
 
     public boolean getBoolean(String key) {
-        return (boolean)data.get(key);
+        return (boolean) data.get(key);
     }
 
     public Object getObject(String key) {
@@ -37,6 +46,15 @@ public class RetrievedEvent implements Event {
 
     public boolean containsKey(String key) {
         return data.containsKey(key);
+    }
+
+    public <T> T getValueAsObject(String key, Class<T> classOfT) {
+        Object value = new Gson().fromJson(jsonValue.get(key), classOfT);
+        return Primitives.wrap(classOfT).cast(value);
+    }
+
+    public <T> T getValueAsObject(String key, Type typeOfT) {
+        return jsonValue == null ? null : new Gson().fromJson(new JsonTreeReader(jsonValue.get(key)), typeOfT);
     }
 
     public int getRequestID() {

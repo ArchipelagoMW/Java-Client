@@ -9,7 +9,6 @@ import gg.archipelago.client.Print.APPrintType;
 import gg.archipelago.client.events.*;
 import gg.archipelago.client.helper.DeathLink;
 import gg.archipelago.client.network.APPacket;
-import gg.archipelago.client.network.APPacketType;
 import gg.archipelago.client.network.ConnectionResult;
 import gg.archipelago.client.network.client.ConnectPacket;
 import gg.archipelago.client.network.client.GetDataPackagePacket;
@@ -191,12 +190,17 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                         break;
                     case Retrieved:
                         RetrievedPacket retrievedPacket = gson.fromJson(packet, RetrievedPacket.class);
-                        archipelagoClient.getEventManager().callEvent(new RetrievedEvent(retrievedPacket.keys, retrievedPacket.requestID));
+                        archipelagoClient.getEventManager().callEvent(new RetrievedEvent(retrievedPacket.keys, packet.getAsJsonObject().get("keys").getAsJsonObject(), retrievedPacket.requestID));
                         break;
                     case SetReply:
                         SetReplyPacket setReplyPacket = gson.fromJson(packet, SetReplyPacket.class);
                         archipelagoClient.getEventManager().callEvent(new SetReplyEvent(setReplyPacket.key, setReplyPacket.value, setReplyPacket.original_Value, packet.getAsJsonObject().get("value"), setReplyPacket.requestID));
                         break;
+                    case InvalidPacket:
+                        InvalidPacket invalidPacket = gson.fromJson(packet, InvalidPacket.class);
+                        archipelagoClient.getEventManager().callEvent(new InvalidPacketEvent(invalidPacket.type, invalidPacket.Original_cmd, invalidPacket.text));
+                    default:
+
                 }
             }
         } catch (Exception e) {
