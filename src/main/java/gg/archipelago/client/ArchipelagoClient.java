@@ -119,7 +119,7 @@ public abstract class ArchipelagoClient {
             dataPackage = new DataPackage();
             saveDataPackage();
         } catch (ClassNotFoundException e) {
-            LOGGER.warning("uhh ohh failed to absorb dataPackage.");
+            LOGGER.info("Failed to Read Previous datapackage. Creating new one.");
             dataPackage = new DataPackage();
         }
     }
