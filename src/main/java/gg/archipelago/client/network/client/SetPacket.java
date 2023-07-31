@@ -173,7 +173,25 @@ public class SetPacket extends APPacket {
          * Applies a bitwise right-shift to the current value of the key on the server by @value.
          */
         @SerializedName("right_shift")
-        RIGHT_SHIFT
+        RIGHT_SHIFT,
+
+        /**
+         * List only: removes the first instance of @value found in the list.
+         */
+        @SerializedName("remove")
+        REMOVE,
+
+        /**
+         * List or Dict: for lists it will remove the index of the @value given. for dicts it removes the element with the specified key of value.
+         */
+        @SerializedName("pop")
+        POP,
+
+        /**
+         * Dict only: Updates the dictionary with the specified elements given in @value creating new keys, or updating old ones if they previously existed.
+         */
+        @SerializedName("update")
+        UPDATE
 
     }
 }
