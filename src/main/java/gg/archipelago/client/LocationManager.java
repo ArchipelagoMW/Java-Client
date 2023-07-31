@@ -21,10 +21,11 @@ public class LocationManager {
         return checkLocations(Collections.singletonList(id));
     }
 
-    public boolean checkLocations(Collection<Long> id) {
-        checkedLocations.addAll(id);
+    public boolean checkLocations(Collection<Long> ids) {
+        ids.removeIf( location -> !missingLocations.contains(location));
+        checkedLocations.addAll(ids);
         LocationChecks packet = new LocationChecks();
-        packet.locations.addAll(id);
+        packet.locations.addAll(ids);
         if(webSocket == null)
             return false;
 
@@ -47,7 +48,7 @@ public class LocationManager {
             webSocket.sendPacket(packet);
     }
 
-    public void sendAllLocations() {
+    public void resendAllCheckedLocations() {
         if (webSocket == null)
                 return;
         LocationChecks packet = new LocationChecks();
@@ -64,7 +65,7 @@ public class LocationManager {
     }
 
     public Set<Long> getMissingLocations() {
-        return checkedLocations;
+        return missingLocations;
     }
 
     public void addCheckedLocations(Set<Long> newLocations) {

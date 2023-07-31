@@ -42,7 +42,7 @@ public class ItemManager {
         else {
             if(webSocket != null) {
                 webSocket.sendPacket(new SyncPacket());
-                archipelagoClient.getLocationManager().sendAllLocations();
+                archipelagoClient.getLocationManager().resendAllCheckedLocations();
             }
         }
     }

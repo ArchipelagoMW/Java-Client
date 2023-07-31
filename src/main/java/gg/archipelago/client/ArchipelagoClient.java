@@ -43,7 +43,6 @@ public abstract class ArchipelagoClient {
     private final LocationManager locationManager;
     private final ItemManager itemManager;
     private final EventManager eventManager;
-    private final DeathLink deathLink;
 
     public static final Version protocolVersion = new Version(0, 3, 7);
 
@@ -64,7 +63,6 @@ public abstract class ArchipelagoClient {
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
         archipelagoClient = this;
-        deathLink = new DeathLink(this);
     }
 
     public void setGame(String game) {
@@ -245,6 +243,7 @@ public abstract class ArchipelagoClient {
     }
 
     public void scoutLocations(ArrayList<Long> locationIDs) {
+        locationIDs.removeIf( location -> !locationManager.getMissingLocations().contains(location));
         archipelagoWebSocket.scoutLocation(locationIDs);
     }
 
