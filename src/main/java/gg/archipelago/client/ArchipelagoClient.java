@@ -13,10 +13,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -243,7 +240,8 @@ public abstract class ArchipelagoClient {
     }
 
     public void scoutLocations(ArrayList<Long> locationIDs) {
-        locationIDs.removeIf( location -> !locationManager.getMissingLocations().contains(location));
+        HashMap<Long, String> locations = dataPackage.getLocationsForGame(game);
+        locationIDs.removeIf( location -> !locations.containsKey(location));
         archipelagoWebSocket.scoutLocation(locationIDs);
     }
 

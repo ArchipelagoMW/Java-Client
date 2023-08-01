@@ -18,12 +18,13 @@ public class LocationManager {
     }
 
     public boolean checkLocation(long id) {
-        return checkLocations(Collections.singletonList(id));
+        return checkLocations(new ArrayList<Long>(1) {{add(id);}});
     }
 
     public boolean checkLocations(Collection<Long> ids) {
         ids.removeIf( location -> !missingLocations.contains(location));
         checkedLocations.addAll(ids);
+        missingLocations.removeAll(ids);
         LocationChecks packet = new LocationChecks();
         packet.locations.addAll(ids);
         if(webSocket == null)

@@ -8,11 +8,14 @@ import java.util.HashMap;
 public class Game implements Serializable {
 
     @SerializedName("version")
-    int version;
+    public int version;
+
+    @SerializedName("hash")
+    public String hash;
 
     @SerializedName("item_name_to_id")
-    HashMap<String,Long> itemNameToId = new HashMap<>();
+    public HashMap<String,Long> itemNameToId = new HashMap<>();
 
     @SerializedName("location_name_to_id")
-    HashMap<String,Long> locationNameToId = new HashMap<>();
+    public HashMap<String,Long> locationNameToId = new HashMap<>();
 }
