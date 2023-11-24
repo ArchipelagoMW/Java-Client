@@ -40,6 +40,7 @@ public abstract class ArchipelagoClient {
     private final LocationManager locationManager;
     private final ItemManager itemManager;
     private final EventManager eventManager;
+    private final DeathLink deathLink;
 
     public static final Version protocolVersion = new Version(0, 3, 7);
 
@@ -59,6 +60,7 @@ public abstract class ArchipelagoClient {
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
+        deathLink = new DeathLink(this);
         archipelagoClient = this;
     }
 
