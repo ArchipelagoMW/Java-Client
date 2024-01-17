@@ -26,4 +26,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: Archipelago.MultiClient.Java-SNAPSHOT
-        path: build/libs/Archcipelago.MultiClient.Java-*-all.jar
+        path: build/libs
