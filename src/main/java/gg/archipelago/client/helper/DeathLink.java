@@ -1,22 +1,17 @@
 package gg.archipelago.client.helper;
 
-import gg.archipelago.client.ArchipelagoClient;
 import gg.archipelago.client.events.DeathLinkEvent;
 import gg.archipelago.client.network.client.BouncePacket;
 import gg.archipelago.client.network.server.BouncedPacket;
 
 import java.util.HashMap;
 
+import static gg.archipelago.client.ArchipelagoClient.archipelagoClient;
+
 
 public class DeathLink {
 
     static private double lastDeath = 0;
-
-    private static ArchipelagoClient archipelagoClient;
-
-    public DeathLink(ArchipelagoClient archipelagoClient) {
-        DeathLink.archipelagoClient = archipelagoClient;
-    }
 
     public static boolean isDeathLink(BouncedPacket bounced) {
         return bounced.tags.contains("DeathLink");

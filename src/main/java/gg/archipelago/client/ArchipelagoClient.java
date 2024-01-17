@@ -273,6 +273,13 @@ public abstract class ArchipelagoClient {
         return game;
     }
 
+    public String getConnectedAddress() {
+        if (isConnected())
+            return archipelagoWebSocket.getRemoteSocketAddress().getHostName()+":"+archipelagoWebSocket.getRemoteSocketAddress().getPort();
+        else
+            return "";
+    }
+
     /**
      * this should not need to be called externally but is left public just in case.
      */
