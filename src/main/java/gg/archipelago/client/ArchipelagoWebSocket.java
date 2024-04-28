@@ -154,10 +154,10 @@ public class ArchipelagoWebSocket extends WebSocketClient {
 
                                 print.parts[p].text = player.alias;
                             } else if (print.parts[p].type == APPrintType.itemID) {
-                                int itemID = Integer.parseInt((print.parts[p].text));
+                                long itemID = Long.parseLong((print.parts[p].text));
                                 print.parts[p].text = archipelagoClient.getDataPackage().getItem(itemID);
                             } else if (print.parts[p].type == APPrintType.locationID) {
-                                int locationID = Integer.parseInt((print.parts[p].text));
+                                long locationID = Long.parseLong((print.parts[p].text));
                                 print.parts[p].text = archipelagoClient.getDataPackage().getLocation(locationID);
                             }
                         }
