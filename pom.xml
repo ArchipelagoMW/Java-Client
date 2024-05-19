@@ -42,4 +42,13 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub konotyran Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/konotyran/Archipelago.MultiClient.Java</url>
+        </repository>
+    </distributionManagement>
+
+
 </project>
