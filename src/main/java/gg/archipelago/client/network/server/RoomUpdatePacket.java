@@ -48,8 +48,8 @@ public class RoomUpdatePacket extends APPacket {
     @SerializedName("datapackage_version")
     public int datapackageVersion;
 
-    @SerializedName("datapackage_versions")
-    public HashMap<String, Integer> datapackageVersions = new HashMap<>();
+    @SerializedName("datapackage_checksums")
+    public HashMap<String, String> datapackageChecksums = new HashMap<>();
 
     public RoomUpdatePacket() {
         super(APPacketType.RoomUpdate);

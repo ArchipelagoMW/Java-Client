@@ -20,4 +20,19 @@ public class APPrint {
     @SerializedName("found")
     public boolean found;
 
+    @SerializedName("team")
+    public String team;
+
+    @SerializedName("slot")
+    public int slot;
+
+    @SerializedName("message")
+    public String message;
+
+    @SerializedName("tags")
+    public String[] tags;
+
+    @SerializedName("countdown")
+    public int countdown;
+
 }

@@ -7,14 +7,14 @@ import java.util.Set;
 
 public class GetDataPackagePacket extends APPacket {
 
-    Set<String> exclusions;
+    Set<String> games;
 
     public GetDataPackagePacket() {
         this(null);
     }
 
-    public GetDataPackagePacket(Set<String> exclusions) {
+    public GetDataPackagePacket(Set<String> games) {
         super(APPacketType.GetDataPackage);
-        this.exclusions = exclusions;
+        this.games = games;
     }
 }

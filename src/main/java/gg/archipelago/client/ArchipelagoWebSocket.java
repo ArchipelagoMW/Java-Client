@@ -79,7 +79,7 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                         //save room info
                         archipelagoClient.setRoomInfo(roomInfo);
 
-                        checkDataPackage(roomInfo.datapackageVersions);
+                        checkDataPackage(roomInfo.datapackageChecksums, roomInfo.games);
 
                         seedName = roomInfo.seedName;
 
@@ -101,6 +101,7 @@ public class ArchipelagoWebSocket extends WebSocketClient {
 
                         archipelagoClient.setTeam(connectedPacket.team);
                         archipelagoClient.setSlot(connectedPacket.slot);
+                        archipelagoClient.setSlotInfo(connectedPacket.slotInfo);
 
                         archipelagoClient.getRoomInfo().networkPlayers.addAll(connectedPacket.players);
                         archipelagoClient.getRoomInfo().networkPlayers.add(new NetworkPlayer(connectedPacket.team, 0, "Archipelago"));
@@ -138,14 +139,11 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                         DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
                         dataPackage.uuid = archipelagoClient.getUUID();
                         archipelagoClient.updateDataPackage(dataPackage);
-                        if (dataPackage.getVersion() != 0) {
-                            archipelagoClient.saveDataPackage();
-                        }
+                        archipelagoClient.saveDataPackage();
                         break;
                     case PrintJSON:
                         LOGGER.finest("PrintJSON packet");
                         APPrint print = gson.fromJson(packet, APPrint.class);
-
                         //filter though all player IDs and replace id with alias.
                         for (int p = 0; print.parts.length > p; ++p) {
                             if (print.parts[p].type == APPrintType.playerID) {
@@ -154,11 +152,11 @@ public class ArchipelagoWebSocket extends WebSocketClient {
 
                                 print.parts[p].text = player.alias;
                             } else if (print.parts[p].type == APPrintType.itemID) {
-                                int itemID = Integer.parseInt((print.parts[p].text));
-                                print.parts[p].text = archipelagoClient.getDataPackage().getItem(itemID);
+                                long itemID = Long.parseLong(print.parts[p].text);
+                                print.parts[p].text = archipelagoClient.getDataPackage().getItem(itemID,archipelagoClient.getSlotInfo().get(print.parts[i].player).game);
                             } else if (print.parts[p].type == APPrintType.locationID) {
-                                int locationID = Integer.parseInt((print.parts[p].text));
-                                print.parts[p].text = archipelagoClient.getDataPackage().getLocation(locationID);
+                                long locationID = Long.parseLong(print.parts[p].text);
+                                print.parts[p].text = archipelagoClient.getDataPackage().getLocation(locationID,archipelagoClient.getSlotInfo().get(print.parts[i].player).game);
                             }
                         }
                         archipelagoClient.onPrintJson(print, print.type, print.receiving, print.item);
@@ -182,8 +180,8 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                     case LocationInfo:
                         LocationInfoPacket locations = gson.fromJson(packet, LocationInfoPacket.class);
                         for (NetworkItem item : locations.locations) {
-                            item.itemName = archipelagoClient.getDataPackage().getItem(item.itemID);
-                            item.locationName = archipelagoClient.getDataPackage().getLocation(item.locationID);
+                            item.itemName = archipelagoClient.getDataPackage().getItem(item.itemID, archipelagoClient.getSlotInfo().get(item.playerID).game);
+                            item.locationName = archipelagoClient.getDataPackage().getLocation(item.locationID, archipelagoClient.getSlotInfo().get(archipelagoClient.getSlot()).game);
                             item.playerName = archipelagoClient.getRoomInfo().getPlayer(archipelagoClient.getTeam(), item.playerID).alias;
                         }
                         archipelagoClient.getEventManager().callEvent(new LocationInfoEvent(locations.locations));
@@ -210,12 +208,10 @@ public class ArchipelagoWebSocket extends WebSocketClient {
     }
 
     private void updateRoom(RoomUpdatePacket updateRoomPacket) {
-        if (updateRoomPacket.networkPlayers.size() != 0) {
+        if (!updateRoomPacket.networkPlayers.isEmpty()) {
             archipelagoClient.getRoomInfo().networkPlayers = updateRoomPacket.networkPlayers;
             archipelagoClient.getRoomInfo().networkPlayers.add(new NetworkPlayer(archipelagoClient.getTeam(), 0, "Archipelago"));
         }
-
-        checkDataPackage(updateRoomPacket.datapackageVersions);
 
         archipelagoClient.setHintPoints(updateRoomPacket.hintPoints);
         archipelagoClient.setAlias(archipelagoClient.getRoomInfo().getPlayer(archipelagoClient.getTeam(), archipelagoClient.getSlot()).alias);
@@ -223,24 +219,27 @@ public class ArchipelagoWebSocket extends WebSocketClient {
         archipelagoClient.getEventManager().callEvent(new CheckedLocationsEvent(updateRoomPacket.checkedLocations));
     }
 
-    private void checkDataPackage(HashMap<String, Integer> versions) {
-        HashSet<String> exclusions = new HashSet<>();
-        for (Map.Entry<String, Integer> game : versions.entrySet()) {
-            //the game does NOT need updating add it to the exclusion list.
-            int myGameVersion = archipelagoClient.getDataPackage().getVersions().getOrDefault(game.getKey(), 0);
-            int newGameVersion = game.getValue();
-            if (newGameVersion <= myGameVersion && newGameVersion != 0) {
-                exclusions.add(game.getKey());
-            }
+
+    private void checkDataPackage(HashMap<String, String> versions, List<String> games) {
+        Set<String> gamesToUpdate = new HashSet<>();
+        Map<String, String> checksums = archipelagoClient.getDataPackage().getChecksums();
+        for (Map.Entry<String, String> game : versions.entrySet()) {
+            if (!games.contains(game.getKey()))
+                continue;
+            if (!checksums.containsKey(game.getKey()))
+                gamesToUpdate.add(game.getKey());
+            if (!checksums.get(game.getKey()).equals(game.getValue()))
+                gamesToUpdate.add(game.getKey());
         }
 
-        if (exclusions.size() != versions.size()) {
-            fetchDataPackageFromAP(exclusions);
+
+        if (!gamesToUpdate.isEmpty()) {
+            fetchDataPackageFromAP(gamesToUpdate);
         }
     }
 
-    private void fetchDataPackageFromAP(Set<String> exclusions) {
-        sendPacket(new GetDataPackagePacket(exclusions));
+    private void fetchDataPackageFromAP(Set<String> games) {
+        sendPacket(new GetDataPackagePacket(games));
     }
 
     public void sendPacket(APPacket packet) {
@@ -267,16 +266,16 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                 try {
                     archipelagoClient.connect(new URIBuilder(uri).setScheme("ws").build());
                 } catch (URISyntaxException ignored) {
-                    archipelagoClient.onClose(reason, 0);
+                    archipelagoClient.onClose("(AP-275) " + reason, 0);
                 }
                 return;
             }
-            archipelagoClient.onClose(reason, 0);
+            archipelagoClient.onClose("(AP-279) " + reason, 0);
             return;
         }
         if (code == 1000) {
             reconnectTimer.cancel();
-            archipelagoClient.onClose("Disconnected.", 0);
+            archipelagoClient.onClose("(AP-284) Disconnected.", 0);
         }
 
         if (code == 1006) {
@@ -294,18 +293,21 @@ public class ArchipelagoWebSocket extends WebSocketClient {
                 reconnectTimer.cancel();
                 reconnectTimer = new Timer();
                 reconnectTimer.schedule(reconnectTask, reconnectDelay);
-                archipelagoClient.onClose(reason, reconnectDelay / 1000);
+                archipelagoClient.onClose("(AP-302)  " + reason, reconnectDelay / 1000);
                 return;
             }
         }
 
         reconnectTimer.cancel();
-        archipelagoClient.onClose(reason, 0);
+        archipelagoClient.onClose("(AP-308) "+reason, 0);
     }
 
     @Override
     public void onError(Exception ex) {
-        if (ex instanceof SSLException) return;
+        if (ex instanceof SSLException) {
+            LOGGER.info(String.format("SSL Error: %s", ex.getMessage()));
+            return;
+        }
         archipelagoClient.onError(ex);
         LOGGER.log(Level.WARNING, "Error in websocket connection");
         ex.printStackTrace();

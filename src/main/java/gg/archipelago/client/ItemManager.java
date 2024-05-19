@@ -31,8 +31,8 @@ public class ItemManager {
             int myTeam = archipelagoClient.getTeam();
             for (int i = this.index; i < receivedItems.size(); i++) {
                 NetworkItem item = receivedItems.get(i);
-                item.itemName = dp.getItem(item.itemID);
-                item.locationName = dp.getLocation(item.locationID);
+                item.itemName = dp.getItem(item.itemID, archipelagoClient.getGame());
+                item.locationName = dp.getLocation(item.locationID, archipelagoClient.getSlotInfo().get(item.playerID).game);
                 item.playerName = archipelagoClient.getRoomInfo().getPlayer(myTeam,item.playerID).alias;
                 archipelagoClient.getEventManager().callEvent(new ReceiveItemEvent(item, index));
             }

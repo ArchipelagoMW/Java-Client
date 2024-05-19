@@ -1,5 +1,6 @@
 package gg.archipelago.client;
 
+import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.Print.APPrint;
 import gg.archipelago.client.helper.DeathLink;
 import gg.archipelago.client.network.client.*;
@@ -7,14 +8,15 @@ import gg.archipelago.client.network.server.ConnectUpdatePacket;
 import gg.archipelago.client.network.server.RoomInfoPacket;
 import gg.archipelago.client.parts.DataPackage;
 import gg.archipelago.client.parts.NetworkItem;
+import gg.archipelago.client.parts.NetworkSlot;
 import gg.archipelago.client.parts.Version;
 import org.apache.hc.core5.net.URIBuilder;
+import org.slf4j.event.Level;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class ArchipelagoClient {
@@ -41,10 +43,11 @@ public abstract class ArchipelagoClient {
     private final ItemManager itemManager;
     private final EventManager eventManager;
 
-    public static final Version protocolVersion = new Version(0, 3, 7);
+    public static final Version protocolVersion = new Version(0, 4, 7);
 
     private int team;
     private int slot;
+    private HashMap<Integer, NetworkSlot> slotInfo;
     private String name = "Name not set";
     private String game = "Game not set";
     private String alias;
@@ -138,7 +141,7 @@ public abstract class ArchipelagoClient {
             objectOut.close();
 
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "unable to save DataPackage.", e);
+            LOGGER.warning("unable to save DataPackage.");
         }
     }
 
@@ -171,6 +174,10 @@ public abstract class ArchipelagoClient {
         this.team = team;
     }
 
+    void setSlotInfo(HashMap<Integer, NetworkSlot> slotInfo) {
+        this.slotInfo = slotInfo;
+    }
+
     void setRoomInfo(RoomInfoPacket roomInfo) {
         this.roomInfo = roomInfo;
     }
@@ -190,6 +197,8 @@ public abstract class ArchipelagoClient {
     public RoomInfoPacket getRoomInfo() {
         return roomInfo;
     }
+
+    public HashMap<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
 
     public void connect(String address) throws URISyntaxException {
         URIBuilder builder = new URIBuilder((!address.contains("//")) ? "//" + address : address);
@@ -406,4 +415,5 @@ public abstract class ArchipelagoClient {
         archipelagoWebSocket.sendPacket(getPacket);
         return getPacket.getRequestID();
     }
+
 }

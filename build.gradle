@@ -7,7 +7,7 @@ plugins {
 
 archivesBaseName = "Archipelago.MultiClient.Java"
 group = 'gg.archipelago.APClient'
-version = '1.12'
+version = '1.13'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
@@ -23,6 +23,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
     implementation 'org.apache.httpcomponents.core5:httpcore5:5.2'
+    implementation 'org.slf4j:slf4j-nop:1.7.30'
 }
 
 tasks.register('relocateShadowJar', ConfigureShadowRelocation) {

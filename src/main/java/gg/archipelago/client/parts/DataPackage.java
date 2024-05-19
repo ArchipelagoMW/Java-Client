@@ -12,44 +12,36 @@ public class DataPackage implements Serializable {
     @SerializedName("games")
     HashMap<String, Game> games = new HashMap<>();
 
-    @Expose
-    @SerializedName("version")
-    int version = -1;
-
     HashMap<Long, String> itemIdToName = new HashMap<>();
 
     HashMap<Long, String> locationIdToName = new HashMap<>();
 
     public String uuid = UUID.randomUUID().toString();
 
-    public String getItem(long itemID) {
-        for (Map.Entry<String, Game> game : games.entrySet()) {
-            for (Map.Entry<String, Long> item : game.getValue().itemNameToId.entrySet()) {
-                if(item.getValue() == itemID)
-                    return item.getKey();
-            }
-        }
-        return String.format("Unknown Item [%d]", itemID);
+    public String getItem(long itemID, String game) {
+        if (!games.containsKey(game))
+            return String.format("Unknown Item [%d] for [%s]", itemID, game);
+
+        if(!games.get(game).itemNameToId.containsValue(itemID))
+            return String.format("Unknown Item [%d] for [%s]", itemID, game);
+
+        return games.get(game).getItem(itemID);
     }
 
-    public String getLocation(long locationID) {
-        if(locationIdToName.containsKey(locationID))
-            return locationIdToName.get(locationID);
-        for (Map.Entry<String, Game> game : games.entrySet()) {
-            for (Map.Entry<String, Long> location : game.getValue().locationNameToId.entrySet()) {
-                if(location.getValue() == locationID) {
-                    locationIdToName.put(locationID, location.getKey());
-                    return location.getKey();
-                }
-            }
-        }
-        return String.format("Unknown Location [%d]", locationID);
+    public String getLocation(long locationID, String game) {
+        if (!games.containsKey(game))
+            return String.format("Unknown Location [%d] for [%s]", locationID, game);
+
+        if (!games.get(game).locationNameToId.containsValue(locationID))
+            return String.format("Unknown Location [%d] for [%s]", locationID, game);
+
+        return games.get(game).getLocation(locationID);
     }
 
-    public Map<String, Integer> getVersions() {
-        HashMap<String, Integer> versions = new HashMap<>();
-        games.forEach((key, value) -> versions.put(key, value.version));
-        return versions;
+    public Map<String, String> getChecksums() {
+        HashMap<String, String> checksums = new HashMap<>();
+        games.forEach((key, value) -> checksums.put(key, value.checksum));
+        return checksums;
     }
 
     public HashMap<String, Game> getGames() {
@@ -100,9 +92,6 @@ public class DataPackage implements Serializable {
         return ret;
     }
 
-    public int getVersion() {
-        return version;
-    }
 
     public String getUUID() {
         return uuid;
@@ -110,6 +99,5 @@ public class DataPackage implements Serializable {
 
     public void update(DataPackage newData) {
         games.putAll(newData.getGames());
-        version = newData.version;
     }
 }
