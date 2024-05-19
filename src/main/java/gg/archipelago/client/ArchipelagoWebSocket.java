@@ -226,8 +226,12 @@ public class ArchipelagoWebSocket extends WebSocketClient {
         for (Map.Entry<String, String> game : versions.entrySet()) {
             if (!games.contains(game.getKey()))
                 continue;
-            if (!checksums.containsKey(game.getKey()))
+
+            if (!checksums.containsKey(game.getKey())) {
                 gamesToUpdate.add(game.getKey());
+                continue;
+            }
+
             if (!checksums.get(game.getKey()).equals(game.getValue()))
                 gamesToUpdate.add(game.getKey());
         }
