@@ -1,8 +1,6 @@
 package gg.archipelago.client;
 
-import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.Print.APPrint;
-import gg.archipelago.client.helper.DeathLink;
 import gg.archipelago.client.network.client.*;
 import gg.archipelago.client.network.server.ConnectUpdatePacket;
 import gg.archipelago.client.network.server.RoomInfoPacket;
@@ -11,7 +9,6 @@ import gg.archipelago.client.parts.NetworkItem;
 import gg.archipelago.client.parts.NetworkSlot;
 import gg.archipelago.client.parts.Version;
 import org.apache.hc.core5.net.URIBuilder;
-import org.slf4j.event.Level;
 
 import java.io.*;
 import java.net.URI;

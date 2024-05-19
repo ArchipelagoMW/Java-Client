@@ -1,6 +1,5 @@
 package gg.archipelago.client.network.client;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import gg.archipelago.client.network.APPacket;
 import gg.archipelago.client.network.APPacketType;

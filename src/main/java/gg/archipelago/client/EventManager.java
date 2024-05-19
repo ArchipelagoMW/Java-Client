@@ -1,7 +1,7 @@
 package gg.archipelago.client;
 
-import gg.archipelago.client.events.Event;
 import gg.archipelago.client.events.ArchipelagoEventListener;
+import gg.archipelago.client.events.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
