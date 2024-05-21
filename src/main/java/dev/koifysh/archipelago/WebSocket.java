@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
 
-public class WebSocket extends WebSocketClient {
+class WebSocket extends WebSocketClient {
 
     private final static java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(WebSocket.class.getName());
 
