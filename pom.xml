@@ -21,8 +21,17 @@
     </licenses>
 
     <scm>
+        <connection>scm:git:git://github.com/KonoTyran/archipelago-client.git</connection>
+        <developerConnection>scm:git:https://github.com/KonoTyran/archipelago-client.git</developerConnection>
         <url>https://github.com/KonoTyran/archipelago-client</url>
     </scm>
+
+    <developers>
+        <developer>
+            <name>Kono Tyran</name>
+            <email>Kono.Tyran@gmail.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
