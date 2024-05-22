@@ -8,14 +8,14 @@ import java.util.HashMap;
 
 import static dev.koifysh.archipelago.Client.client;
 
-
+/**
+ * a helper-class for sending and receiving death links.
+ * <br>
+ * enable death links by calling {@link #setDeathLinkEnabled(boolean)}
+ */
 public class DeathLink {
 
     static private double lastDeath = 0;
-
-    public static boolean isDeathLink(BouncedPacket bounced) {
-        return bounced.tags.contains("DeathLink");
-    }
 
     public static void receiveDeathLink(BouncedPacket bounced) {
         try {
@@ -29,6 +29,11 @@ public class DeathLink {
         }
     }
 
+    /**
+     * helper for sending a death link bounce packet. you can send these without enabling death link first, but it is frowned upon.
+     * @param source A String that is the name of the player sending the death link (does not have to be slot name)
+     * @param cause A String that is the cause of this death. may be empty.
+     */
     public static void SendDeathLink(String source, String cause) {
         lastDeath = (double)System.currentTimeMillis() / 1000D;
 
@@ -42,6 +47,10 @@ public class DeathLink {
         client.sendBounce(deathLinkPacket);
     }
 
+    /**
+     * Enable or Disable receiving death links.
+     * @param enabled set to TRUE to enable death links, FALSE to disable.
+     */
     public static void setDeathLinkEnabled(boolean enabled) {
         if(enabled)
             client.addTag("DeathLink");

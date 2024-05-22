@@ -242,6 +242,11 @@ public abstract class Client {
 
     public HashMap<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
 
+    /**
+     * Works exactly like {@link #connect(URI, boolean)} with allowDowngrade set to true;
+     * @param address
+     * @throws URISyntaxException on malformed address
+     */
     public void connect(String address) throws URISyntaxException {
         URIBuilder builder = new URIBuilder((!address.contains("//")) ? "//" + address : address);
         if (builder.getPort() == -1) { //set default port if not included
@@ -262,6 +267,10 @@ public abstract class Client {
         connect(builder.build());
     }
 
+    /**
+     * Works exactly like {@link #connect(URI, boolean)} but allowDowngrade is False
+     * @param address Address to connect to
+     */
     public void connect(URI address) {
         connect(address, false);
     }
@@ -290,6 +299,10 @@ public abstract class Client {
         webSocket.connect(allowDowngrade);
     }
 
+    /**
+     * Sends a Chat message to all other connected Clients.
+     * @param message Message to send.
+     */
     public void sendChat(String message) {
         if (webSocket == null)
             return;
@@ -298,23 +311,46 @@ public abstract class Client {
         }
     }
 
+    /**
+     * inform the Archipelago server that a location ID has been checked.
+     * @param locationID id of a location.
+     * @return true if packet was successfully sent. False if not connected or otherwise failed to send.
+     */
     public boolean checkLocation(long locationID) {
         return locationManager.checkLocation(locationID);
     }
 
+    /**
+     * inform the Archipelago server that a collection of location ID has been checked.
+     * @param locationIDs a collection of a locations.
+     * @return true if packet was successfully sent. False if not connected or otherwise failed to send.
+     */
     public boolean checkLocations(Collection<Long> locationIDs) {
         return locationManager.checkLocations(locationIDs);
     }
 
+    /**
+     * Ask the server for information about what is in locations. you will get a response in the {@link dev.koifysh.archipelago.events.LocationInfoEvent} event.
+     * @param locationIDs List of location ID's to request info on.
+     */
     public void scoutLocations(ArrayList<Long> locationIDs) {
         HashMap<Long, String> locations = dataPackage.getLocationsForGame(game);
         locationIDs.removeIf( location -> !locations.containsKey(location));
         webSocket.scoutLocation(locationIDs);
     }
 
-    public abstract void onPrint(String print);
-
-    public abstract void onPrintJson(APPrint apPrint, String type, int sending, NetworkItem receiving);
+    /**
+     * Called when the server wishes to display a message to the user.
+     * <br>
+     * Deprecated use {@link dev.koifysh.archipelago.events.PrintJSONEvent} instead
+     * @see dev.koifysh.archipelago.events.PrintJSONEvent
+     * @param apPrint list of message segments.
+     * @param type the type of the received message.
+     * @param player int id of the sending player.
+     * @param item the network item that is involved with the message.
+     */
+    @Deprecated
+    public abstract void onPrintJson(APPrint apPrint, String type, int player, NetworkItem item);
 
     public abstract void onError(Exception ex);
 
@@ -354,14 +390,26 @@ public abstract class Client {
         webSocket.reconnect();
     }
 
+    /**
+     * Gets the UUID of this client.
+     * @return UUID of the client, this should theoretically never change.
+     */
     public String getUUID() {
         return UUID;
     }
 
+    /**
+     * gets the alias of this slot.
+     * @return Alias of the slot connected to.
+     */
     public String getAlias() {
         return alias;
     }
 
+    /**
+     * sets an Alias for this slot on the Archipelago server.
+     * @param alias Name to set the alias to.
+     */
     void setAlias(String alias) {
         this.alias = alias;
     }
@@ -374,6 +422,12 @@ public abstract class Client {
         return itemManager;
     }
 
+    /**
+     * Update the current game status.
+     * @see ClientStatus
+     *
+     * @param status a {@link ClientStatus} to send to the server.
+     */
     public void setGameState(ClientStatus status) {
         if (webSocket == null)
             return;
@@ -381,6 +435,9 @@ public abstract class Client {
             webSocket.sendPacket(new StatusUpdatePacket(status));
     }
 
+    /**
+     * manually trigger a resync to the Archipelago server. this should be done automatically if the library detects a desync.
+     */
     public void sync() {
         webSocket.sendPacket(new SyncPacket());
     }
@@ -392,22 +449,38 @@ public abstract class Client {
             webSocket.sendPacket(bouncePacket);
     }
 
+    /**
+     * disconnects from a connected Archipelago server.
+     */
     public void disconnect() {
         webSocket.close();
     }
 
+    /**
+     * @return set of tags currently in use.
+     */
     public Set<String> getTags() {
         return tags;
     }
 
+    /**
+     * fetch the itemflags that have been set, bitwise Or against {@link ItemFlags} to read.
+     * @return items handling int.
+     */
     public int getItemsHandlingFlags() {
         return itemsHandlingFlags;
     }
 
+    /**
+     * fetch the itemflags that have been set, bitwise Or against {@link ItemFlags} to read.
+     */
     public void setItemsHandlingFlags(int itemsHandlingFlags) {
         this.itemsHandlingFlags = itemsHandlingFlags;
     }
 
+    /**
+     * @return the event manager.
+     */
     public EventManager getEventManager() {
         return eventManager;
     }
@@ -415,7 +488,6 @@ public abstract class Client {
     /**
      * Uses DataStorage to save a value on the AP server.
      *
-     * @param setPacket
      */
     public int dataStorageSet(SetPacket setPacket) {
         if (webSocket == null || !webSocket.isAuthenticated())

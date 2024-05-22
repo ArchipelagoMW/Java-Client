@@ -132,9 +132,6 @@ class WebSocket extends WebSocketClient {
                         ConnectionRefusedPacket error = gson.fromJson(cmdList.get(i), ConnectionRefusedPacket.class);
                         client.getEventManager().callEvent(new ConnectionResultEvent(error.errors[0]));
                         break;
-                    case Print:
-                        client.onPrint(gson.fromJson(packet, PrintPacket.class).getText());
-                        break;
                     case DataPackage:
                         JsonElement data = packet.getAsJsonObject().get("data");
                         DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
@@ -160,7 +157,12 @@ class WebSocket extends WebSocketClient {
                                 print.parts[p].text = client.getDataPackage().getLocation(locationID, client.getSlotInfo().get(print.parts[i].player).game);
                             }
                         }
+
+                        client.getEventManager().callEvent(new PrintJSONEvent(print, print.type, print.receiving, print.item));
+
+                        //todo: remove next version
                         client.onPrintJson(print, print.type, print.receiving, print.item);
+
                         break;
                     case RoomUpdate:
                         RoomUpdatePacket updatePacket = gson.fromJson(packet, RoomUpdatePacket.class);
@@ -173,7 +175,7 @@ class WebSocket extends WebSocketClient {
                         break;
                     case Bounced:
                         BouncedPacket bounced = gson.fromJson(packet, BouncedPacket.class);
-                        if (DeathLink.isDeathLink(bounced))
+                        if (bounced.tags.contains("DeathLink"))
                             DeathLink.receiveDeathLink(bounced);
                         else
                             client.getEventManager().callEvent(new BouncedEvent(bounced.games, bounced.tags, bounced.slots, bounced.data));

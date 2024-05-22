@@ -8,10 +8,20 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manages registering and calling events
+ * @see #registerListener(Object)
+ */
 public class EventManager {
 
     private final Map<Method, Object> registeredListeners = new HashMap<>();
 
+    /**
+     * Use to register for Events that come from the Archipelago server.
+     * supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
+     * and have 1 parameter that extends {@link Event}
+     * @param listener the object containing a listener method.
+     */
     public void registerListener(Object listener) {
         for (Method method : listener.getClass().getMethods()) {
             if (!method.isAnnotationPresent(ArchipelagoEventListener.class))

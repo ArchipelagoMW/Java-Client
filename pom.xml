@@ -6,7 +6,7 @@
 
     <groupId>dev.koifysh</groupId>
     <artifactId>archipelago-client</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.13</version>
 
     <name>Archipelago Java Library</name>
     <description>Library to connect to an Archipelago Server</description>
@@ -21,7 +21,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/KonoTyran/archipelago-client.git</connection>
+        <connection>scm:git:git://github.com/KonoTyran/archipelago-client</connection>
         <developerConnection>scm:git:https://github.com/KonoTyran/archipelago-client.git</developerConnection>
         <url>https://github.com/KonoTyran/archipelago-client</url>
     </scm>
