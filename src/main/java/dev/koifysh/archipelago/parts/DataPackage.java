@@ -14,10 +14,6 @@ public class DataPackage implements Serializable {
     @SerializedName("games")
     HashMap<String, Game> games = new HashMap<>();
 
-    HashMap<Long, String> itemIdToName = new HashMap<>();
-
-    HashMap<Long, String> locationIdToName = new HashMap<>();
-
     public String uuid = UUID.randomUUID().toString();
 
     public String getItem(long itemID, String game) {
@@ -50,48 +46,8 @@ public class DataPackage implements Serializable {
         return games;
     }
 
-    public HashMap<Long, String> getItems() {
-        if(itemIdToName.isEmpty()) {
-            for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-                for (Map.Entry<String, Long> items : gameEntry.getValue().itemNameToId.entrySet()) {
-                    itemIdToName.put(items.getValue(), items.getKey());
-                }
-            }
-        }
-        return itemIdToName;
-    }
-
-    public HashMap<Long, String> getItemsForGame(String game) {
-        HashMap<Long, String> ret = new HashMap<>();
-        for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-            if(!gameEntry.getKey().equals(game)) continue;
-            for (Map.Entry<String, Long> items : gameEntry.getValue().itemNameToId.entrySet()) {
-                ret.put(items.getValue(), items.getKey());
-            }
-        }
-        return ret;
-    }
-
-    public HashMap<Long, String> getLocations() {
-        if(locationIdToName.isEmpty()) {
-            for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-                for (Map.Entry<String, Long> locations : gameEntry.getValue().locationNameToId.entrySet()) {
-                    itemIdToName.put(locations.getValue(), locations.getKey());
-                }
-            }
-        }
-        return itemIdToName;
-    }
-
-    public HashMap<Long, String> getLocationsForGame(String game) {
-        HashMap<Long, String> ret = new HashMap<>();
-        for (Map.Entry<String, Game> gameEntry : games.entrySet()) {
-            if(!gameEntry.getKey().equals(game)) continue;
-            for (Map.Entry<String, Long> locations : gameEntry.getValue().locationNameToId.entrySet()) {
-                ret.put(locations.getValue(), locations.getKey());
-            }
-        }
-        return ret;
+    public Game getGame(String game) {
+        return games.get(game);
     }
 
 

@@ -334,8 +334,7 @@ public abstract class Client {
      * @param locationIDs List of location ID's to request info on.
      */
     public void scoutLocations(ArrayList<Long> locationIDs) {
-        HashMap<Long, String> locations = dataPackage.getLocationsForGame(game);
-        locationIDs.removeIf( location -> !locations.containsKey(location));
+        locationIDs.removeIf( location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
         webSocket.scoutLocation(locationIDs);
     }
 
