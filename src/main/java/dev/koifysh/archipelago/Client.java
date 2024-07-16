@@ -338,19 +338,6 @@ public abstract class Client {
         webSocket.scoutLocation(locationIDs);
     }
 
-    /**
-     * Called when the server wishes to display a message to the user.
-     * <br>
-     * Deprecated use {@link dev.koifysh.archipelago.events.PrintJSONEvent} instead
-     * @see dev.koifysh.archipelago.events.PrintJSONEvent
-     * @param apPrint list of message segments.
-     * @param type the type of the received message.
-     * @param player int id of the sending player.
-     * @param item the network item that is involved with the message.
-     */
-    @Deprecated
-    public abstract void onPrintJson(APPrint apPrint, String type, int player, NetworkItem item);
-
     public abstract void onError(Exception ex);
 
     public abstract void onClose(String Reason, int attemptingReconnect);

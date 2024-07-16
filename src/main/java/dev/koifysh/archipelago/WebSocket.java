@@ -160,9 +160,6 @@ class WebSocket extends WebSocketClient {
 
                         client.getEventManager().callEvent(new PrintJSONEvent(print, print.type, print.receiving, print.item));
 
-                        //todo: remove next version
-                        client.onPrintJson(print, print.type, print.receiving, print.item);
-
                         break;
                     case RoomUpdate:
                         RoomUpdatePacket updatePacket = gson.fromJson(packet, RoomUpdatePacket.class);
