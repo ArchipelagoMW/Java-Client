@@ -317,8 +317,8 @@ class WebSocket extends WebSocketClient {
             return;
         }
         client.onError(ex);
-        LOGGER.log(Level.WARNING, "Error in websocket connection");
-        ex.printStackTrace();
+        LOGGER.log(Level.WARNING, "Error in websocket connection: " + ex.getMessage());
+        //ex.printStackTrace();
     }
 
     public void connect(boolean allowDowngrade) {
