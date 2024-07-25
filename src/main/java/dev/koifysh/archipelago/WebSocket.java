@@ -206,8 +206,8 @@ class WebSocket extends WebSocketClient {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warning("Error proccessing incoming packet: ");
-            e.printStackTrace();
+            LOGGER.warning("Error proccessing incoming packet: " + e.getMessage());
+            //e.printStackTrace();
         }
     }
 
