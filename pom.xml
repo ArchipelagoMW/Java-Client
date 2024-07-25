@@ -6,7 +6,7 @@
 
     <groupId>dev.koifysh</groupId>
     <artifactId>archipelago-client</artifactId>
-    <version>0.1.14</version>
+    <version>0.1.15</version>
 
     <name>Archipelago Java Library</name>
     <description>Library to connect to an Archipelago Server</description>
