@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import dev.koifysh.archipelago.Print.APPrint;
+import dev.koifysh.archipelago.Print.APPrintPart;
 import dev.koifysh.archipelago.Print.APPrintType;
 import dev.koifysh.archipelago.helper.DeathLink;
 import dev.koifysh.archipelago.network.APPacket;
@@ -66,8 +67,8 @@ class WebSocket extends WebSocketClient {
 
             JsonArray cmdList = element.getAsJsonArray();
 
-            for (int i = 0; cmdList.size() > i; ++i) {
-                JsonElement packet = cmdList.get(i);
+            for (int commandNumber = 0; cmdList.size() > commandNumber; ++commandNumber) {
+                JsonElement packet = cmdList.get(commandNumber);
                 //parse the packet first to see what command has been sent.
                 APPacket cmd = gson.fromJson(packet, APPacket.class);
 
@@ -129,7 +130,7 @@ class WebSocket extends WebSocketClient {
                         }
                         break;
                     case ConnectionRefused:
-                        ConnectionRefusedPacket error = gson.fromJson(cmdList.get(i), ConnectionRefusedPacket.class);
+                        ConnectionRefusedPacket error = gson.fromJson(cmdList.get(commandNumber), ConnectionRefusedPacket.class);
                         client.getEventManager().callEvent(new ConnectionResultEvent(error.errors[0]));
                         break;
                     case DataPackage:
@@ -143,18 +144,21 @@ class WebSocket extends WebSocketClient {
                         LOGGER.finest("PrintJSON packet");
                         APPrint print = gson.fromJson(packet, APPrint.class);
                         //filter though all player IDs and replace id with alias.
-                        for (int p = 0; print.parts.length > p; ++p) {
-                            if (print.parts[p].type == APPrintType.playerID) {
-                                int playerID = Integer.parseInt((print.parts[p].text));
-                                NetworkPlayer player = client.getRoomInfo().getPlayer(client.getTeam(), playerID);
+                        for (int partNumber = 0; print.parts.length > partNumber; ++partNumber) {
+                            APPrintPart part = print.parts[partNumber];
 
-                                print.parts[p].text = player.alias;
-                            } else if (print.parts[p].type == APPrintType.itemID) {
-                                long itemID = Long.parseLong(print.parts[p].text);
-                                print.parts[p].text = client.getDataPackage().getItem(itemID, client.getSlotInfo().get(print.parts[i].player).game);
-                            } else if (print.parts[p].type == APPrintType.locationID) {
-                                long locationID = Long.parseLong(print.parts[p].text);
-                                print.parts[p].text = client.getDataPackage().getLocation(locationID, client.getSlotInfo().get(print.parts[i].player).game);
+                            if (part.type == APPrintType.playerID) {
+                                int playerID = Integer.parseInt(part.text);
+                                NetworkPlayer player = client.getRoomInfo().getPlayer(client.getTeam(), playerID);
+                                part.text = player.alias;
+                            }
+                            else if (part.type == APPrintType.itemID) {
+                                long itemID = Long.parseLong(part.text);
+                                part.text = client.getDataPackage().getItem(itemID, client.getSlotInfo().get(part.player).game);
+                            }
+                            else if (part.type == APPrintType.locationID) {
+                                long locationID = Long.parseLong(part.text);
+                                part.text = client.getDataPackage().getLocation(locationID, client.getSlotInfo().get(part.player).game);
                             }
                         }
 
