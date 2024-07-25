@@ -34,7 +34,7 @@ public class ItemManager {
                 item.itemName = dp.getItem(item.itemID, client.getGame());
                 item.locationName = dp.getLocation(item.locationID, client.getSlotInfo().get(item.playerID).game);
                 item.playerName = client.getRoomInfo().getPlayer(myTeam,item.playerID).alias;
-                client.getEventManager().callEvent(new ReceiveItemEvent(item, i));
+                client.getEventManager().callEvent(new ReceiveItemEvent(item, i+1));
             }
 
             this.index = receivedItems.size();
