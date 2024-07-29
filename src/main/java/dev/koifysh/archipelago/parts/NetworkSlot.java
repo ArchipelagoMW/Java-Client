@@ -38,4 +38,10 @@ public class NetworkSlot {
         public final static int GROUP = 0b100;
 
     }
+
+    public NetworkSlot(String name, String game, int type) {
+        this.name = name;
+        this.game = game;
+        this.type = type;
+    }
 }

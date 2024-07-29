@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import dev.koifysh.archipelago.Print.APPrint;
+import dev.koifysh.archipelago.Print.APPrintJsonType;
 import dev.koifysh.archipelago.Print.APPrintPart;
 import dev.koifysh.archipelago.Print.APPrintType;
 import dev.koifysh.archipelago.helper.DeathLink;
@@ -20,6 +21,7 @@ import dev.koifysh.archipelago.parts.NetworkPlayer;
 import dev.koifysh.archipelago.events.*;
 import dev.koifysh.archipelago.network.server.*;
 
+import dev.koifysh.archipelago.parts.NetworkSlot;
 import org.apache.hc.core5.net.URIBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -103,10 +105,19 @@ class WebSocket extends WebSocketClient {
 
                         client.setTeam(connectedPacket.team);
                         client.setSlot(connectedPacket.slot);
+                        connectedPacket.slotInfo.put(0, new NetworkSlot("Archipelago", "Archipelago", NetworkSlot.flags.SPECTATOR));
                         client.setSlotInfo(connectedPacket.slotInfo);
 
                         client.getRoomInfo().networkPlayers.addAll(connectedPacket.players);
-                        client.getRoomInfo().networkPlayers.add(new NetworkPlayer(connectedPacket.team, 0, "Archipelago"));
+                        int teams = 1;
+                        OptionalInt teamsOptional = client.getRoomInfo().networkPlayers.stream().mapToInt(player -> player.team).max();
+                        if (teamsOptional.isPresent()) {
+                            teams = teamsOptional.getAsInt() + 1;
+                        }
+                        for (int i = 0; i < teams; i++) {
+                            client.getRoomInfo().networkPlayers.add( new NetworkPlayer(i, 0, "Archipelago"));
+                        }
+
                         client.setAlias(client.getRoomInfo().getPlayer(connectedPacket.team, connectedPacket.slot).alias);
 
                         JsonElement slotData = packet.getAsJsonObject().get("slot_data");
@@ -143,6 +154,7 @@ class WebSocket extends WebSocketClient {
                     case PrintJSON:
                         LOGGER.finest("PrintJSON packet");
                         APPrint print = gson.fromJson(packet, APPrint.class);
+                        if (print.type == null) print.type = APPrintJsonType.Unknown;
                         //filter though all player IDs and replace id with alias.
                         for (int partNumber = 0; print.parts.length > partNumber; ++partNumber) {
                             APPrintPart part = print.parts[partNumber];
@@ -214,7 +226,6 @@ class WebSocket extends WebSocketClient {
     private void updateRoom(RoomUpdatePacket updateRoomPacket) {
         if (!updateRoomPacket.networkPlayers.isEmpty()) {
             client.getRoomInfo().networkPlayers = updateRoomPacket.networkPlayers;
-            client.getRoomInfo().networkPlayers.add(new NetworkPlayer(client.getTeam(), 0, "Archipelago"));
         }
 
         client.setHintPoints(updateRoomPacket.hintPoints);
