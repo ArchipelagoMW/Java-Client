@@ -9,7 +9,7 @@ public class APPrint {
     public APPrintPart[] parts;
 
     @SerializedName("type")
-    public String type;
+    public APPrintJsonType type;
 
     @SerializedName("receiving")
     public int receiving;

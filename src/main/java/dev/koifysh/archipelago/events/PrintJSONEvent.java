@@ -1,6 +1,7 @@
 package dev.koifysh.archipelago.events;
 
 import dev.koifysh.archipelago.Print.APPrint;
+import dev.koifysh.archipelago.Print.APPrintJsonType;
 import dev.koifysh.archipelago.parts.NetworkItem;
 
 /**
@@ -9,7 +10,7 @@ import dev.koifysh.archipelago.parts.NetworkItem;
 public class PrintJSONEvent implements Event {
 
     public APPrint apPrint;
-    public String type;
+    public APPrintJsonType type;
     public int player;
     public NetworkItem item;
 
@@ -19,7 +20,7 @@ public class PrintJSONEvent implements Event {
      * @param player int id of the sending player.
      * @param item the network item that is involved with the message.
      */
-    public PrintJSONEvent(APPrint apPrint, String type, int player, NetworkItem item) {
+    public PrintJSONEvent(APPrint apPrint, APPrintJsonType type, int player, NetworkItem item) {
         this.apPrint = apPrint;
         this.type = type;
         this.player = player;

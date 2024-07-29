@@ -5,6 +5,7 @@ import dev.koifysh.archipelago.events.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,15 +25,37 @@ public class EventManager {
      */
     public void registerListener(Object listener) {
         for (Method method : listener.getClass().getMethods()) {
-            if (!method.isAnnotationPresent(ArchipelagoEventListener.class))
-                continue;
-            if (method.getParameterTypes().length != 1)
-                continue;
-            if (!Event.class.isAssignableFrom(method.getParameterTypes()[0]))
-                continue;
+            if (isEventListenerMethod(listener, method)) continue;
 
             registeredListeners.put(method, listener);
         }
+    }
+
+    /**
+     * Use to unregister for Events that come from the Archipelago server.
+     * supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
+     * and have 1 parameter that extends {@link Event}
+     * @param listener the object containing a listener method.
+     */
+    public void unRegisterListener(Object listener) {
+        for (Method method : listener.getClass().getMethods()) {
+            if (isEventListenerMethod(listener, method)) continue;
+
+            registeredListeners.remove(method, listener);
+        }
+    }
+
+    private boolean isEventListenerMethod(Object listener, Method method) {
+        if(listener instanceof Class<?>)
+            if (!Modifier.isStatic(method.getModifiers()))
+                return true;
+        if (!method.isAnnotationPresent(ArchipelagoEventListener.class))
+            return true;
+        if (method.getParameterTypes().length != 1)
+            return true;
+        if (!Event.class.isAssignableFrom(method.getParameterTypes()[0]))
+            return true;
+        return false;
     }
 
     public void callEvent(final Event event) {
