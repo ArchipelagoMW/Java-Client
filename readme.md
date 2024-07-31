@@ -14,7 +14,7 @@ To use maven add this dependency to your `pom.xml`:
 <dependency>
     <groupId>dev.koifysh</groupId>
     <artifactId>archipelago-client</artifactId>
-    <version>0.1.18</version>
+    <version>0.1.19</version>
 </dependency>
 ```
 
@@ -22,5 +22,5 @@ To use maven add this dependency to your `pom.xml`:
 To use Gradle add the maven central repository to your repositories list:
 then add this to your `dependancy` section
 ```java
-implementation 'dev.koifysh:archipelago-client:0.1.18'
+implementation 'dev.koifysh:archipelago-client:0.1.19'
 ```
