@@ -35,4 +35,12 @@ public class APPrint {
     @SerializedName("countdown")
     public int countdown;
 
+    public String getPlainText() {
+        StringBuilder sb = new StringBuilder();
+        for (APPrintPart part : parts) {
+            sb.append(part.text);
+        }
+        return sb.toString();
+    }
+
 }

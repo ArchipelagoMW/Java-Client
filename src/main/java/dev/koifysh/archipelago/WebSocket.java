@@ -105,7 +105,7 @@ class WebSocket extends WebSocketClient {
 
                         client.setTeam(connectedPacket.team);
                         client.setSlot(connectedPacket.slot);
-                        connectedPacket.slotInfo.put(0, new NetworkSlot("Archipelago", "Archipelago", NetworkSlot.flags.SPECTATOR));
+                        connectedPacket.slotInfo.put(0, new NetworkSlot("Archipelago", "Archipelago", NetworkPlayerFlags.SPECTATOR));
                         client.setSlotInfo(connectedPacket.slotInfo);
 
                         client.getRoomInfo().networkPlayers.addAll(connectedPacket.players);
@@ -172,6 +172,12 @@ class WebSocket extends WebSocketClient {
                                 long locationID = Long.parseLong(part.text);
                                 part.text = client.getDataPackage().getLocation(locationID, client.getSlotInfo().get(part.player).game);
                             }
+                        }
+
+                        if (print.item != null) {
+                            print.item.itemName = client.getDataPackage().getItem(print.item.itemID, client.getSlotInfo().get(print.item.playerID).game);
+                            print.item.locationName = client.getDataPackage().getLocation(print.item.locationID, client.getSlotInfo().get(print.item.playerID).game);
+                            print.item.playerName = client.getRoomInfo().getPlayer(client.getTeam(), print.item.playerID).alias;
                         }
 
                         client.getEventManager().callEvent(new PrintJSONEvent(print, print.type, print.receiving, print.item));

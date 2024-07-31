@@ -1,6 +1,7 @@
 package dev.koifysh.archipelago.parts;
 
 import com.google.gson.annotations.SerializedName;
+import dev.koifysh.archipelago.NetworkItemFlags;
 
 public class NetworkItem {
 
@@ -14,7 +15,7 @@ public class NetworkItem {
     public int playerID;
 
     /**
-     * Bit flags that tell you information about the item. bitwise OR them with {@link flags} to read.
+     * Bit flags that tell you information about the item. bitwise AND them with {@link NetworkItemFlags} to read.
      */
     @SerializedName("flags")
     public int flags;
@@ -30,7 +31,7 @@ public class NetworkItem {
      * {@link #USEFUL},
      * {@link #TRAP}
      */
-    public static class flags {
+    public static class Flags {
 
         /**
          * If set, indicates the item can unlock logical advancement

@@ -5,7 +5,7 @@ package dev.koifysh.archipelago;
  * <br>
  * Current item flags: {@link #SEND_ITEMS} {@link #SEND_OWN_ITEMS} {@link #SEND_STARTING_INVENTORY}
  */
-public class ItemFlags {
+public class ItemsHandlingFlags {
 
     /**
      * Tells the server to send you items from other worlds.
