@@ -1,4 +1,4 @@
-package dev.koifysh.archipelago;
+package dev.koifysh.archipelago.flags;
 
 /**
  * Flags that will tell you more about the item that was sent.<br>
@@ -6,7 +6,7 @@ package dev.koifysh.archipelago;
  * {@link #USEFUL},
  * {@link #TRAP}
  */
-public class NetworkItemFlags {
+public class NetworkItem {
     /**
      * If set, indicates the item can unlock logical advancement
      */

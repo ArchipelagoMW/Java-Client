@@ -1,4 +1,4 @@
-package dev.koifysh.archipelago;
+package dev.koifysh.archipelago.flags;
 
 /**
  * Flags that will tell you more about the slot type.<br>
@@ -6,7 +6,7 @@ package dev.koifysh.archipelago;
  * {@link #PLAYER},
  * {@link #GROUP}
  */
-public class NetworkPlayerFlags {
+public class NetworkPlayer {
     /**
      * If set, indicates the slot is a spectator
      */

@@ -1,11 +1,13 @@
-package dev.koifysh.archipelago;
+package dev.koifysh.archipelago.flags;
+
+import dev.koifysh.archipelago.Client;
 
 /**
  * Item Flag variables to read {@link Client#getItemsHandlingFlags()} and set {@link Client#setItemsHandlingFlags(int)}
  * <br>
  * Current item flags: {@link #SEND_ITEMS} {@link #SEND_OWN_ITEMS} {@link #SEND_STARTING_INVENTORY}
  */
-public class ItemsHandlingFlags {
+public class ItemsHandling {
 
     /**
      * Tells the server to send you items from other worlds.

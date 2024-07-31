@@ -8,6 +8,7 @@ import dev.koifysh.archipelago.Print.APPrint;
 import dev.koifysh.archipelago.Print.APPrintJsonType;
 import dev.koifysh.archipelago.Print.APPrintPart;
 import dev.koifysh.archipelago.Print.APPrintType;
+import dev.koifysh.archipelago.flags.NetworkPlayer;
 import dev.koifysh.archipelago.helper.DeathLink;
 import dev.koifysh.archipelago.network.APPacket;
 import dev.koifysh.archipelago.network.ConnectionResult;
@@ -17,7 +18,6 @@ import dev.koifysh.archipelago.network.client.LocationScouts;
 import dev.koifysh.archipelago.network.client.SayPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
 import dev.koifysh.archipelago.parts.NetworkItem;
-import dev.koifysh.archipelago.parts.NetworkPlayer;
 import dev.koifysh.archipelago.events.*;
 import dev.koifysh.archipelago.network.server.*;
 
@@ -105,7 +105,7 @@ class WebSocket extends WebSocketClient {
 
                         client.setTeam(connectedPacket.team);
                         client.setSlot(connectedPacket.slot);
-                        connectedPacket.slotInfo.put(0, new NetworkSlot("Archipelago", "Archipelago", NetworkPlayerFlags.SPECTATOR));
+                        connectedPacket.slotInfo.put(0, new NetworkSlot("Archipelago", "Archipelago", NetworkPlayer.SPECTATOR));
                         client.setSlotInfo(connectedPacket.slotInfo);
 
                         client.getRoomInfo().networkPlayers.addAll(connectedPacket.players);
@@ -115,7 +115,7 @@ class WebSocket extends WebSocketClient {
                             teams = teamsOptional.getAsInt() + 1;
                         }
                         for (int i = 0; i < teams; i++) {
-                            client.getRoomInfo().networkPlayers.add( new NetworkPlayer(i, 0, "Archipelago"));
+                            client.getRoomInfo().networkPlayers.add( new dev.koifysh.archipelago.parts.NetworkPlayer(i, 0, "Archipelago"));
                         }
 
                         client.setAlias(client.getRoomInfo().getPlayer(connectedPacket.team, connectedPacket.slot).alias);
@@ -161,7 +161,7 @@ class WebSocket extends WebSocketClient {
 
                             if (part.type == APPrintType.playerID) {
                                 int playerID = Integer.parseInt(part.text);
-                                NetworkPlayer player = client.getRoomInfo().getPlayer(client.getTeam(), playerID);
+                                dev.koifysh.archipelago.parts.NetworkPlayer player = client.getRoomInfo().getPlayer(client.getTeam(), playerID);
                                 part.text = player.alias;
                             }
                             else if (part.type == APPrintType.itemID) {

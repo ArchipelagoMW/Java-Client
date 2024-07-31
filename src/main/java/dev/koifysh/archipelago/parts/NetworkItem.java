@@ -1,7 +1,6 @@
 package dev.koifysh.archipelago.parts;
 
 import com.google.gson.annotations.SerializedName;
-import dev.koifysh.archipelago.NetworkItemFlags;
 
 public class NetworkItem {
 
@@ -15,7 +14,7 @@ public class NetworkItem {
     public int playerID;
 
     /**
-     * Bit flags that tell you information about the item. bitwise AND them with {@link NetworkItemFlags} to read.
+     * Bit flags that tell you information about the item. bitwise AND them with {@link dev.koifysh.archipelago.flags.NetworkItem} to read.
      */
     @SerializedName("flags")
     public int flags;

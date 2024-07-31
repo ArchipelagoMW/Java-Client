@@ -1,6 +1,7 @@
 package dev.koifysh.archipelago;
 
 import dev.koifysh.archipelago.events.RetrievedEvent;
+import dev.koifysh.archipelago.flags.ItemsHandling;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
 import dev.koifysh.archipelago.network.server.RoomInfoPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
@@ -448,7 +449,7 @@ public abstract class Client {
     }
 
     /**
-     * fetch the itemflags that have been set, bitwise Or against {@link ItemsHandlingFlags} to read.
+     * fetch the itemflags that have been set, bitwise Or against {@link ItemsHandling} to read.
      * @return items handling int.
      */
     public int getItemsHandlingFlags() {
@@ -456,7 +457,7 @@ public abstract class Client {
     }
 
     /**
-     * fetch the itemflags that have been set, bitwise Or against {@link ItemsHandlingFlags} to read.
+     * fetch the itemflags that have been set, bitwise Or against {@link ItemsHandling} to read.
      */
     public void setItemsHandlingFlags(int itemsHandlingFlags) {
         this.itemsHandlingFlags = itemsHandlingFlags;
