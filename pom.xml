@@ -6,30 +6,30 @@
 
     <groupId>dev.koifysh</groupId>
     <artifactId>archipelago-client</artifactId>
-    <version>0.1.19</version>
+    <version>0.1.20-SNAPSHOT</version>
 
     <name>Archipelago Java Library</name>
     <description>Library to connect to an Archipelago Server</description>
-    <url>https://github.com/KonoTyran/archipelago-client</url>
+    <url>https://github.com/ArchipelagoMW/Java-Client</url>
 
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://github.com/KonoTyran/archipelago-client/blob/main/LICENSE</url>
+            <url>https://github.com/ArchipelagoMW/Java-Client/blob/main/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/KonoTyran/archipelago-client</connection>
-        <developerConnection>scm:git:https://github.com/KonoTyran/archipelago-client.git</developerConnection>
-        <url>https://github.com/KonoTyran/archipelago-client</url>
+        <connection>git://github.com/ArchipelagoMW/Java-Client</connection>
+        <developerConnection>git:https://github.com/ArchipelagoMW/Java-Client.git</developerConnection>
+        <url>https://github.com/ArchipelagoMW/Java-Client</url>
     </scm>
 
     <developers>
         <developer>
             <name>Kono Tyran</name>
-            <email>Kono.Tyran@gmail.com</email>
+            <email>Kono@koifysh.dev</email>
         </developer>
     </developers>
 
