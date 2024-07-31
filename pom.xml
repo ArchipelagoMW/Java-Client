@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.koifysh</groupId>
     <artifactId>archipelago-client</artifactId>
-    <version>0.1.20-SNAPSHOT</version>
+    <version>0.1.20</version>
 
     <name>Archipelago Java Library</name>
     <description>Library to connect to an Archipelago Server</description>
@@ -24,7 +22,8 @@
         <connection>git://github.com/ArchipelagoMW/Java-Client</connection>
         <developerConnection>git:https://github.com/ArchipelagoMW/Java-Client.git</developerConnection>
         <url>https://github.com/ArchipelagoMW/Java-Client</url>
-    </scm>
+      <tag>archipelago-client-0.1.20</tag>
+  </scm>
 
     <developers>
         <developer>
