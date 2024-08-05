@@ -1,10 +1,21 @@
 name: Update Dependancy Graph
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   dependency-graph:
+
     runs-on: ubuntu-latest
+
     steps:
-    - name: Submit Dependency Snapshot
-      uses: advanced-security/maven-dependency-submission-action@v4
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v4
