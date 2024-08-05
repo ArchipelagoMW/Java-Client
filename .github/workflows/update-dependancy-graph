@@ -1,0 +1,9 @@
+name: Update Dependancy Graph
+
+on: [push]
+
+jobs:
+  dependency-graph:
+    steps:
+    - name: Submit Dependency Snapshot
+      uses: advanced-security/maven-dependency-submission-action@v4
