@@ -8,9 +8,7 @@
 
 name: Java CI with Maven
 
-on:
-  push:
-    branches: [ "main" ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -32,7 +30,3 @@ jobs:
       with:
         name: Package
         path: staging
-
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@bb3f7338b5bd0e3b225d8082e26b7b6289e17ef3
