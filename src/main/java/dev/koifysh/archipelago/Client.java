@@ -40,7 +40,7 @@ public abstract class Client {
     private final ItemManager itemManager;
     private final EventManager eventManager;
 
-    public static final Version protocolVersion = new Version(0, 4, 7);
+    public static final Version protocolVersion = new Version(0, 6, 1);
 
     private int team;
     private int slot;
@@ -517,6 +517,21 @@ public abstract class Client {
      *         <td> item_name_groups_{game_name} </td>
      *         <td> dict[str, list[str]] </td>
      *         <td> item_name_groups belonging to the requested game. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> location_name_groups_{game_name} </td>
+     *         <td> dict[str, list[str]] </td>
+     *         <td> location_name_groups belonging to the requested game. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> client_status_{team}_{slot} </td>
+     *         <td> ClientStatus </td>
+     *         <td> The current game status of the requested player. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> race_mode </td>
+     *         <td> int </td>
+     *         <td> 0 if race mode is disabled, and 1 if it's enabled. </td>
      *     </tr>
      * </table>
      *
