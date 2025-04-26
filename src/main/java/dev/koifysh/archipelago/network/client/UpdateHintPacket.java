@@ -16,8 +16,8 @@ public class UpdateHintPacket extends APPacket{
     @SerializedName("location")
     int location;
 
-    // @SerializedName("status")
-    // HintStatus status;
+    @SerializedName("status")
+    HintStatus status;
 
     public UpdateHintPacket(){
         super(APPacketType.UpdateHint);
