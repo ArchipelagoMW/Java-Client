@@ -49,7 +49,7 @@ public abstract class Client {
 
     protected static ArrayList<String> games;
 
-    private final Gson gson = new Gson();
+    private final static Gson gson = new Gson();
 
     private int hintPoints;
 
@@ -61,7 +61,7 @@ public abstract class Client {
 
     private RoomInfoPacket roomInfo;
 
-    private DataPackage dataPackage;
+    private static DataPackage dataPackage;
 
     public static Client client;
 
@@ -88,11 +88,10 @@ public abstract class Client {
             dataPackageLocation = otherDataPackageCache;
         }
 
+        if(dataPackage == null){
+            dataPackage = new DataPackage();
+        }
 
-        //loadDataPackage();
-
-        dataPackage = new DataPackage();
-        
         UUID = dataPackage.getUUID();
 
         eventManager = new EventManager();
@@ -156,7 +155,7 @@ public abstract class Client {
     }
 
 
-    protected void loadDataPackage() {
+    protected static synchronized void loadDataPackage() {
 
         File directoryPath = dataPackageLocation.toFile();
 
@@ -181,8 +180,7 @@ public abstract class Client {
                                     updateDataPackage(gson.fromJson(reader, DataPackage.class));
                                     LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
                                 } catch (IOException e){
-                                    LOGGER.info("Failed to read a datapackage. Creating a new one.");
-                                    dataPackage = new DataPackage();
+                                    LOGGER.info("Failed to read a datapackage. Starting with a new one.");
                                 }
                             }
                         }
@@ -193,18 +191,14 @@ public abstract class Client {
             //cache doesn't exist. Create the filepath
             boolean success = directoryPath.mkdirs();
             if(success){
-                //make a new datapackage
-                LOGGER.info("DataPackage directory didn't exist. Starting from fresh.");
-                dataPackage = new DataPackage();
-                //saveDataPackage();
+                LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
             } else{
-                //failed to make directories?
                 LOGGER.severe("Failed to make directories for datapackage cache.");
             }
         }
     }
 
-    public synchronized void saveDataPackage() {
+    public static synchronized void saveDataPackage() {
         
         //Loop through games to ensure we have folders for each of them in the cache
         for(String gameName : games){
@@ -286,7 +280,7 @@ public abstract class Client {
         this.roomInfo = roomInfo;
     }
 
-    void updateDataPackage(DataPackage newData) {
+    static void updateDataPackage(DataPackage newData) {
         dataPackage.update(newData);
     }
 
