@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -24,13 +26,26 @@ public abstract class Client {
 
     private static String OS = System.getProperty("os.name").toLowerCase();
 
-    private static final String windowsDataPackageCache = ((System.getenv("LOCALAPPDATA") != null) ? System.getenv("LOCALAPPDATA").concat("\\Archipelago\\cache\\datapackage\\") : System.getProperty("user.home").concat("\\appdata\\local\\Archipelago\\cache\\datapackage\\"));
+    private static final Path windowsDataPackageCache;
+    
+    private static final Path otherDataPackageCache;
+    
+    static
+    {
+        String appData = System.getenv("LOCALAPPDATA");
+        String userHome = System.getProperty("user.home");
+        if(appData  == null || appData.isEmpty()) {
+            windowsDataPackageCache = Paths.get(userHome, "appdata","local","Archipelago","cache","datapackage");
+            
+        } else {
+        windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
+        }
+        otherDataPackageCache =  Paths.get(userHome, ".cache", "Archipelago", "datapackage");
+    }
 
-    private static final String otherDataPackageCache = System.getProperty("user.home").concat("/.cache/Archipelago/datapackage/");
+    private static Path dataPackageLocation;
 
-    private static String dataPackageLocation;
-
-    protected static HashMap<String,String> versions;
+    protected static Map<String,String> versions;
 
     protected static ArrayList<String> games;
 
@@ -142,22 +157,23 @@ public abstract class Client {
 
 
     protected void loadDataPackage() {
-        //NOTE FIX HOW WE LOAD DATAPACKAGES. WE ONLY WANT TO LOAD WHAT LOCALGAMES WE ARE USING INTO RAM
-        
-        File directoryPath = new File(dataPackageLocation);
+
+        File directoryPath = dataPackageLocation.toFile();
 
         //ensure the path to the cache exists
-        if(directoryPath.exists()){
+        if(directoryPath.exists() && directoryPath.isDirectory()){
             //loop through all Archipelago cache folders to find valid data package files 
-            HashMap<String,File> localGamesList = new HashMap<String,File>();
+            Map<String,File> localGamesList = new HashMap<String,File>();
 
             for(File gameDir : directoryPath.listFiles()){
-                localGamesList.put(gameDir.getName(), gameDir);
+                if(gameDir.isDirectory()){
+                    localGamesList.put(gameDir.getName(), gameDir);
+                }
             }
 
             if(!localGamesList.isEmpty()){
                 for(String gameName : games){
-                    if(localGamesList.containsKey(gameName) && localGamesList.get(gameName).isDirectory()){
+                    if(localGamesList.containsKey(gameName)){
                         //check all checksums
                         for(File version : localGamesList.get(gameName).listFiles()){
                             if(versions.containsKey(gameName) && versions.get(gameName).equals(version.getName())){
@@ -188,40 +204,33 @@ public abstract class Client {
         }
     }
 
-    public void saveDataPackage() {
+    public synchronized void saveDataPackage() {
         
         //Loop through games to ensure we have folders for each of them in the cache
         for(String gameName : games){
-            File gameFolder = new File(dataPackageLocation.concat(gameName));
+            File gameFolder = dataPackageLocation.resolve(gameName).toFile();
             if(!gameFolder.exists()){
                 //game folder not found. Make it
                 gameFolder.mkdirs();
             }
 
             //save the datapackage
-            for(Map.Entry<String, String> game : versions.entrySet()){
-                //if game is not in list of games
-                if (!games.contains(game.getKey()))
-                    continue;
-
-                //if key is for this game
-                if(game.getKey().equals(gameName)){
-                    String filePath; 
-                    if(OS.startsWith("windows")){
-                        filePath = dataPackageLocation.concat(gameName).concat("\\").concat(game.getValue());
-                    } else{
-                        filePath = dataPackageLocation.concat(gameName).concat("/").concat(game.getValue());
-                    }
-
-                    try (Writer writer = new FileWriter(filePath)){
-                        //if game is in list of games, save it
-                        gson.toJson(dataPackage.getGame(game.getKey()), writer);
-                        LOGGER.info("Saving datapackage for Game: ".concat(game.getKey()).concat(" Checksum: ").concat(game.getValue()));
-                    } catch (IOException e) {
-                        LOGGER.warning("unable to save DataPackage.");
-                    }
-                }
+            String gameVersion = versions.get(gameName); 
+            if(gameVersion == null) { 
+                continue; 
             }
+
+            //if key is for this game
+            File filePath = dataPackageLocation.resolve(gameName).resolve(gameVersion).toFile();
+
+            try (Writer writer = new FileWriter(filePath)){
+                //if game is in list of games, save it
+                gson.toJson(dataPackage.getGame(gameName), writer);
+                LOGGER.info("Saving datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(gameVersion));
+            } catch (IOException e) {
+                LOGGER.warning("unable to save DataPackage.");
+            }
+
         }
     }
 
