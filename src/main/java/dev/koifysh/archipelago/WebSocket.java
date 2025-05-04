@@ -24,6 +24,9 @@ import dev.koifysh.archipelago.network.server.*;
 import dev.koifysh.archipelago.parts.NetworkSlot;
 import org.apache.hc.core5.net.URIBuilder;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_6455;
+import org.java_websocket.extensions.permessage_deflate.PerMessageDeflateExtension;
 import org.java_websocket.handshake.ServerHandshake;
 
 import javax.net.ssl.SSLException;
@@ -48,8 +51,10 @@ class WebSocket extends WebSocketClient {
     private static Timer reconnectTimer;
     private boolean downgrade = false;
 
+    private static final Draft perMessageDeflateDraft = new Draft_6455(new PerMessageDeflateExtension());
+
     public WebSocket(URI serverUri, Client client) {
-        super(serverUri);
+        super(serverUri, perMessageDeflateDraft);
         this.client = client;
         if (reconnectTimer != null) {
             reconnectTimer.cancel();
@@ -82,6 +87,11 @@ class WebSocket extends WebSocketClient {
 
                         //save room info
                         client.setRoomInfo(roomInfo);
+
+                        Client.versions = roomInfo.datapackageChecksums;
+                        Client.games = roomInfo.games;
+
+                        client.loadDataPackage();
 
                         checkDataPackage(roomInfo.datapackageChecksums, roomInfo.games);
 
