@@ -88,8 +88,8 @@ class WebSocket extends WebSocketClient {
                         //save room info
                         client.setRoomInfo(roomInfo);
 
-                        Client.versions = roomInfo.datapackageChecksums;
-                        Client.games = roomInfo.games;
+                        client.versions = roomInfo.datapackageChecksums;
+                        client.games = roomInfo.games;
 
                         client.loadDataPackage();
 

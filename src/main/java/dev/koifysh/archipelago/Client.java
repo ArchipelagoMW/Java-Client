@@ -45,9 +45,9 @@ public abstract class Client {
 
     private static Path dataPackageLocation;
 
-    protected static Map<String,String> versions;
+    protected Map<String,String> versions;
 
-    protected static ArrayList<String> games;
+    protected ArrayList<String> games;
 
     private final static Gson gson = new Gson();
 
@@ -61,7 +61,7 @@ public abstract class Client {
 
     private RoomInfoPacket roomInfo;
 
-    private static DataPackage dataPackage;
+    private DataPackage dataPackage;
 
     public static Client client;
 
@@ -155,76 +155,78 @@ public abstract class Client {
     }
 
 
-    protected static synchronized void loadDataPackage() {
+    protected void loadDataPackage() {
+        synchronized (Client.class){
+            File directoryPath = dataPackageLocation.toFile();
 
-        File directoryPath = dataPackageLocation.toFile();
+            //ensure the path to the cache exists
+            if(directoryPath.exists() && directoryPath.isDirectory()){
+                //loop through all Archipelago cache folders to find valid data package files 
+                Map<String,File> localGamesList = new HashMap<String,File>();
 
-        //ensure the path to the cache exists
-        if(directoryPath.exists() && directoryPath.isDirectory()){
-            //loop through all Archipelago cache folders to find valid data package files 
-            Map<String,File> localGamesList = new HashMap<String,File>();
-
-            for(File gameDir : directoryPath.listFiles()){
-                if(gameDir.isDirectory()){
-                    localGamesList.put(gameDir.getName(), gameDir);
+                for(File gameDir : directoryPath.listFiles()){
+                    if(gameDir.isDirectory()){
+                        localGamesList.put(gameDir.getName(), gameDir);
+                    }
                 }
-            }
 
-            if(!localGamesList.isEmpty()){
-                for(String gameName : games){
-                    if(localGamesList.containsKey(gameName)){
-                        //check all checksums
-                        for(File version : localGamesList.get(gameName).listFiles()){
-                            if(versions.containsKey(gameName) && versions.get(gameName).equals(version.getName())){
-                                try(FileReader reader = new FileReader(version)){
-                                    updateDataPackage(gson.fromJson(reader, DataPackage.class));
-                                    LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
-                                } catch (IOException e){
-                                    LOGGER.info("Failed to read a datapackage. Starting with a new one.");
+                if(!localGamesList.isEmpty()){
+                    for(String gameName : games){
+                        if(localGamesList.containsKey(gameName)){
+                            //check all checksums
+                            for(File version : localGamesList.get(gameName).listFiles()){
+                                if(versions.containsKey(gameName) && versions.get(gameName).equals(version.getName())){
+                                    try(FileReader reader = new FileReader(version)){
+                                        updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                                        LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
+                                    } catch (IOException e){
+                                        LOGGER.info("Failed to read a datapackage. Starting with a new one.");
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        } else{
-            //cache doesn't exist. Create the filepath
-            boolean success = directoryPath.mkdirs();
-            if(success){
-                LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
             } else{
-                LOGGER.severe("Failed to make directories for datapackage cache.");
+                //cache doesn't exist. Create the filepath
+                boolean success = directoryPath.mkdirs();
+                if(success){
+                    LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
+                } else{
+                    LOGGER.severe("Failed to make directories for datapackage cache.");
+                }
             }
         }
     }
 
-    public static synchronized void saveDataPackage() {
-        
-        //Loop through games to ensure we have folders for each of them in the cache
-        for(String gameName : games){
-            File gameFolder = dataPackageLocation.resolve(gameName).toFile();
-            if(!gameFolder.exists()){
-                //game folder not found. Make it
-                gameFolder.mkdirs();
+    public void saveDataPackage() {
+        synchronized (Client.class){
+            //Loop through games to ensure we have folders for each of them in the cache
+            for(String gameName : games){
+                File gameFolder = dataPackageLocation.resolve(gameName).toFile();
+                if(!gameFolder.exists()){
+                    //game folder not found. Make it
+                    gameFolder.mkdirs();
+                }
+
+                //save the datapackage
+                String gameVersion = versions.get(gameName); 
+                if(gameVersion == null) { 
+                    continue; 
+                }
+
+                //if key is for this game
+                File filePath = dataPackageLocation.resolve(gameName).resolve(gameVersion).toFile();
+
+                try (Writer writer = new FileWriter(filePath)){
+                    //if game is in list of games, save it
+                    gson.toJson(dataPackage.getGame(gameName), writer);
+                    LOGGER.info("Saving datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(gameVersion));
+                } catch (IOException e) {
+                    LOGGER.warning("unable to save DataPackage.");
+                }
+
             }
-
-            //save the datapackage
-            String gameVersion = versions.get(gameName); 
-            if(gameVersion == null) { 
-                continue; 
-            }
-
-            //if key is for this game
-            File filePath = dataPackageLocation.resolve(gameName).resolve(gameVersion).toFile();
-
-            try (Writer writer = new FileWriter(filePath)){
-                //if game is in list of games, save it
-                gson.toJson(dataPackage.getGame(gameName), writer);
-                LOGGER.info("Saving datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(gameVersion));
-            } catch (IOException e) {
-                LOGGER.warning("unable to save DataPackage.");
-            }
-
         }
     }
 
@@ -280,7 +282,7 @@ public abstract class Client {
         this.roomInfo = roomInfo;
     }
 
-    static void updateDataPackage(DataPackage newData) {
+    void updateDataPackage(DataPackage newData) {
         dataPackage.update(newData);
     }
 
