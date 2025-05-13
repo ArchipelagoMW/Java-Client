@@ -7,9 +7,10 @@ import dev.koifysh.archipelago.network.APPacketType;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SetPacket extends APPacket {
-
+    private static final AtomicInteger requestIdGen = new AtomicInteger();
     /**
      * The key to manipulate. Can never start with "_read".
      */
@@ -37,13 +38,13 @@ public class SetPacket extends APPacket {
     public ArrayList<DataStorageOperation> operations = new ArrayList<>();
 
     @SerializedName("request_id")
-    private int requestID;
+    private final int requestID;
 
     public SetPacket(String key, Object defaultValue) {
         super(APPacketType.Set);
         this.key = key;
         this.defaultValue = defaultValue;
-        requestID = new Random().nextInt(Integer.MAX_VALUE);
+        requestID = requestIdGen.getAndIncrement();
     }
 
     /**
