@@ -24,7 +24,8 @@ public class EventManager {
      * @param listener the object containing a listener method.
      */
     public void registerListener(Object listener) {
-        for (Method method : listener.getClass().getMethods()) {
+        Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
+        for (Method method : methods) {
             if (isEventListenerMethod(listener, method)) continue;
 
             registeredListeners.put(method, listener);
@@ -38,7 +39,8 @@ public class EventManager {
      * @param listener the object containing a listener method.
      */
     public void unRegisterListener(Object listener) {
-        for (Method method : listener.getClass().getMethods()) {
+        Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
+        for (Method method : methods) {
             if (isEventListenerMethod(listener, method)) continue;
 
             registeredListeners.remove(method, listener);
