@@ -12,10 +12,7 @@ import dev.koifysh.archipelago.flags.NetworkPlayer;
 import dev.koifysh.archipelago.helper.DeathLink;
 import dev.koifysh.archipelago.network.APPacket;
 import dev.koifysh.archipelago.network.ConnectionResult;
-import dev.koifysh.archipelago.network.client.ConnectPacket;
-import dev.koifysh.archipelago.network.client.GetDataPackagePacket;
-import dev.koifysh.archipelago.network.client.LocationScouts;
-import dev.koifysh.archipelago.network.client.SayPacket;
+import dev.koifysh.archipelago.network.client.*;
 import dev.koifysh.archipelago.parts.DataPackage;
 import dev.koifysh.archipelago.parts.NetworkItem;
 import dev.koifysh.archipelago.events.*;
@@ -366,6 +363,12 @@ class WebSocket extends WebSocketClient {
 
     public void scoutLocation(ArrayList<Long> locationIDs) {
         LocationScouts packet = new LocationScouts(locationIDs);
+        sendPacket(packet);
+    }
+
+    public void scoutlocations(ArrayList<Long> locationIDs, int createAsHint)
+    {
+        LocationScouts packet = new LocationScouts(locationIDs, createAsHint);
         sendPacket(packet);
     }
 }

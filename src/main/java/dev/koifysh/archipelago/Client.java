@@ -406,6 +406,12 @@ public abstract class Client {
         webSocket.scoutLocation(locationIDs);
     }
 
+    public void scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
+    {
+        locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
+        webSocket.scoutlocations(locationIDs, createAsHint.value);
+    }
+
     public abstract void onError(Exception ex);
 
     public abstract void onClose(String Reason, int attemptingReconnect);
