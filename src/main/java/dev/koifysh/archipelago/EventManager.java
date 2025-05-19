@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages registering and calling events
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public class EventManager {
 
-    private final Map<Method, Object> registeredListeners = new HashMap<>();
+    private final Map<Method, Object> registeredListeners = new ConcurrentHashMap<>();
 
     /**
      * Use to register for Events that come from the Archipelago server.

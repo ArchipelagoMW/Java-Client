@@ -23,6 +23,7 @@ public enum APPrintColor {
     purple_bg(Color.decode("#800080")),
     cyan_bg(Color.cyan),
     white_bg(Color.white),
+    magenta_bg(Color.magenta),
     gold(Color.decode("#FFD700"));
 
     public final Color color;
