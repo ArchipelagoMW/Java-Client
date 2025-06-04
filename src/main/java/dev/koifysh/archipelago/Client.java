@@ -180,24 +180,26 @@ public abstract class Client {
                   }
                   return;
                 }
-        for(String gameName : games) {
-            File dir = localGamesList.get(gameName);
-            if(null == dir){
-                continue;
-            }
-                //check all checksums
-            for(File version : dir.listFiles()){
-                String versionStr = versions.get(gameName);
-                if(versionStr != null && versionStr.equals(version.getName())) {
-                    try(FileReader reader = new FileReader(version)){
-                        updateDataPackage(gson.fromJson(reader, DataPackage.class));
-                        LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
-                    } catch (IOException e){
-                        LOGGER.info("Failed to read a datapackage. Starting with a new one.");
+
+                for(String gameName : games) {
+                    File dir = localGamesList.get(gameName);
+                    if(null == dir){
+                        continue;
+                    }
+                        //check all checksums
+                    for(File version : dir.listFiles()){
+                        String versionStr = versions.get(gameName);
+                        if(versionStr != null && versionStr.equals(version.getName())) {
+                            try(FileReader reader = new FileReader(version)){
+                                updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                                LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
+                            } catch (IOException e){
+                                LOGGER.info("Failed to read a datapackage. Starting with a new one.");
+                            }
+                        }
                     }
                 }
             }
-        }
         }
     }
 
