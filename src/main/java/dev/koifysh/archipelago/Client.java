@@ -170,32 +170,34 @@ public abstract class Client {
                     }
                 }
 
-                if(!localGamesList.isEmpty()){
-                    for(String gameName : games){
-                        if(localGamesList.containsKey(gameName)){
-                            //check all checksums
-                            for(File version : localGamesList.get(gameName).listFiles()){
-                                if(versions.containsKey(gameName) && versions.get(gameName).equals(version.getName())){
-                                    try(FileReader reader = new FileReader(version)){
-                                        updateDataPackage(gson.fromJson(reader, DataPackage.class));
-                                        LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
-                                    } catch (IOException e){
-                                        LOGGER.info("Failed to read a datapackage. Starting with a new one.");
-                                    }
-                                }
-                            }
-                        }
+                if(localGamesList.isEmpty()){
+                                //cache doesn't exist. Create the filepath
+                  boolean success = directoryPath.mkdirs();
+                  if(success){
+                      LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
+                  } else{
+                      LOGGER.severe("Failed to make directories for datapackage cache.");
+                  }
+                  return;
+                }
+        for(String gameName : games) {
+            File dir = localGamesList.get(gameName);
+            if(null == dir){
+                continue;
+            }
+                //check all checksums
+            for(File version : dir.listFiles()){
+                String versionStr = versions.get(gameName);
+                if(versionStr != null && versionStr.equals(version.getName())) {
+                    try(FileReader reader = new FileReader(version)){
+                        updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                        LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
+                    } catch (IOException e){
+                        LOGGER.info("Failed to read a datapackage. Starting with a new one.");
                     }
                 }
-            } else{
-                //cache doesn't exist. Create the filepath
-                boolean success = directoryPath.mkdirs();
-                if(success){
-                    LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
-                } else{
-                    LOGGER.severe("Failed to make directories for datapackage cache.");
-                }
             }
+        }
         }
     }
 
