@@ -171,22 +171,24 @@ public abstract class Client {
                 }
 
                 if(localGamesList.isEmpty()){
-                                //cache doesn't exist. Create the filepath
-                  boolean success = directoryPath.mkdirs();
-                  if(success){
-                      LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
-                  } else{
-                      LOGGER.severe("Failed to make directories for datapackage cache.");
-                  }
-                  return;
+                    //cache doesn't exist. Create the filepath
+                    boolean success = directoryPath.mkdirs();
+                    if(success){
+                        LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
+                    } else{
+                        LOGGER.severe("Failed to make directories for datapackage cache.");
+                    }
+                    return;
                 }
 
                 for(String gameName : games) {
                     File dir = localGamesList.get(gameName);
+                    
                     if(null == dir){
                         continue;
                     }
-                        //check all checksums
+                    
+                    //check all checksums
                     for(File version : dir.listFiles()){
                         String versionStr = versions.get(gameName);
                         if(versionStr != null && versionStr.equals(version.getName())) {
