@@ -33,7 +33,7 @@ public abstract class Client {
     static
     {
         String appData = System.getenv("LOCALAPPDATA");
-        String userHome = System.getProperty("user.home");
+        String userHome = System.getProperty("USERPROFILE");
         if(appData  == null || appData.isEmpty()) {
             windowsDataPackageCache = Paths.get(userHome, "appdata","local","Archipelago","cache","datapackage");
             
