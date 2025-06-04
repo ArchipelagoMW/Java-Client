@@ -33,13 +33,15 @@ public abstract class Client {
     static
     {
         String appData = System.getenv("LOCALAPPDATA");
-        String userHome = System.getProperty("USERPROFILE");
+        String winHome = System.getenv("USERPROFILE");
+        String userHome = System.getProperty("user.home");
+
         if(appData  == null || appData.isEmpty()) {
-            windowsDataPackageCache = Paths.get(userHome, "appdata","local","Archipelago","cache","datapackage");
-            
+            windowsDataPackageCache = Paths.get(winHome, "appdata","local","Archipelago","cache","datapackage");
         } else {
-        windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
+            windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
         }
+        
         otherDataPackageCache =  Paths.get(userHome, ".cache", "Archipelago", "datapackage");
     }
 
