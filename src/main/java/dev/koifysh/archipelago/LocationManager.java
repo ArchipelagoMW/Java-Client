@@ -2,19 +2,18 @@ package dev.koifysh.archipelago;
 
 import dev.koifysh.archipelago.network.client.LocationChecks;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LocationManager {
 
-    Client client;
-    WebSocket webSocket;
+    // TODO: why is this field unused?
+    private final Client client;
+    private WebSocket webSocket;
 
-    Set<Long> checkedLocations = new HashSet<>();
+    private final Set<Long> checkedLocations = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    Set<Long> missingLocations = new HashSet<>();
+    private final Set<Long> missingLocations = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public LocationManager(Client client) {
         this.client = client;
@@ -60,7 +59,7 @@ public class LocationManager {
         webSocket.sendPacket(packet);
     }
 
-    protected void setAPWebSocket(WebSocket webSocket) {
+    void setAPWebSocket(WebSocket webSocket) {
         this.webSocket = webSocket;
     }
 
@@ -77,7 +76,8 @@ public class LocationManager {
         this.missingLocations.removeAll(newLocations);
     }
 
-    public void setMissingLocations(HashSet<Long> missingLocations) {
-        this.missingLocations = missingLocations;
+    public void setMissingLocations(Set<Long> missingLocations) {
+        this.missingLocations.clear();
+        this.missingLocations.addAll(missingLocations);
     }
 }

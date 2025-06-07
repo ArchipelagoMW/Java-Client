@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Game implements Serializable {
 
@@ -14,13 +15,13 @@ public class Game implements Serializable {
     public String checksum;
 
     @SerializedName("item_name_to_id")
-    public HashMap<String,Long> itemNameToId = new HashMap<>();
+    public Map<String,Long> itemNameToId = new HashMap<>();
 
     @SerializedName("location_name_to_id")
-    public HashMap<String,Long> locationNameToId = new HashMap<>();
+    public Map<String,Long> locationNameToId = new HashMap<>();
 
-    private final HashMap<Long,String> idToItem = new HashMap<>();
-    private final HashMap<Long,String> idToLocation = new HashMap<>();
+    private final Map<Long,String> idToItem = new ConcurrentHashMap<>();
+    private final Map<Long,String> idToLocation = new ConcurrentHashMap<>();
 
     public String getItem(long itemID) {
         if(idToItem.isEmpty()) {

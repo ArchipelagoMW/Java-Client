@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class APPacket {
 
-    @Expose
     @SerializedName("cmd")
     private APPacketType cmd;
 

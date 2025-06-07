@@ -21,4 +21,5 @@ public class NetworkItem {
      * If set, indicates the item is a trap
      */
     public final static int TRAP = 0b100;
+
 }

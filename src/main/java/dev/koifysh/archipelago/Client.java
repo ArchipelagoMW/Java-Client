@@ -19,18 +19,23 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public abstract class Client {
 
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
 
-    private static String OS = System.getProperty("os.name").toLowerCase();
+    public static final Version protocolVersion = new Version(0, 6, 1);
+
+    private static final String OS = System.getProperty("os.name").toLowerCase();
 
     private static final Path windowsDataPackageCache;
     
     private static final Path otherDataPackageCache;
-    
+
+    private final static Gson gson = new Gson();
+
     static
     {
         String appData = System.getenv("LOCALAPPDATA");
@@ -50,9 +55,7 @@ public abstract class Client {
 
     protected Map<String,String> versions;
 
-    protected ArrayList<String> games;
-
-    private final static Gson gson = new Gson();
+    protected List<String> games;
 
     private int hintPoints;
 
@@ -60,11 +63,13 @@ public abstract class Client {
 
     private String password;
 
-    private final String UUID;
+    // TODO: migrate over to reading/writing from persistent storage; see CommonClient
+    // Supposed to uniquely identify the user
+    private final String uuid = UUID.randomUUID().toString();
 
     private RoomInfoPacket roomInfo;
 
-    private DataPackage dataPackage;
+    private final DataPackage dataPackage = new DataPackage();
 
     public static Client client;
 
@@ -72,15 +77,13 @@ public abstract class Client {
     private final ItemManager itemManager;
     private final EventManager eventManager;
 
-    public static final Version protocolVersion = new Version(0, 6, 1);
-
     private int team;
     private int slot;
-    private HashMap<Integer, NetworkSlot> slotInfo;
+    private Map<Integer, NetworkSlot> slotInfo;
     private String name = "Name not set";
     private String game = "Game not set";
     private String alias;
-    private Set<String> tags = new HashSet<>();
+    private final Set<String> tags = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private int itemsHandlingFlags = 0b000;
 
     public Client() {
@@ -90,12 +93,6 @@ public abstract class Client {
         } else{
             dataPackageLocation = otherDataPackageCache;
         }
-
-        if(dataPackage == null){
-            dataPackage = new DataPackage();
-        }
-
-        UUID = dataPackage.getUUID();
 
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
@@ -118,7 +115,8 @@ public abstract class Client {
      */
     public void setTags(Set<String> tags) {
         if (!this.tags.equals(tags)) {
-            this.tags = tags;
+            this.tags.clear();
+            this.tags.addAll(tags);
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -132,8 +130,7 @@ public abstract class Client {
      * @param tag String tag to be added.
      */
     public void addTag(String tag) {
-        if (!this.tags.contains(tag)) {
-            tags.add(tag);
+        if(tags.add(tag)) {
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -147,8 +144,7 @@ public abstract class Client {
      * @param tag String tag to be removed.
      */
     public void removeTag(String tag) {
-        if (this.tags.contains(tag)) {
-            tags.remove(tag);
+        if(tags.remove(tag)) {
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -283,7 +279,7 @@ public abstract class Client {
         this.team = team;
     }
 
-    void setSlotInfo(HashMap<Integer, NetworkSlot> slotInfo) {
+    void setSlotInfo(Map<Integer, NetworkSlot> slotInfo) {
         this.slotInfo = slotInfo;
     }
 
@@ -319,7 +315,7 @@ public abstract class Client {
         return roomInfo;
     }
 
-    public HashMap<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
+    public Map<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
 
     /**
      * Works exactly like {@link #connect(URI, boolean)} with allowDowngrade set to true;
@@ -478,7 +474,7 @@ public abstract class Client {
      * @return UUID of the client, this should theoretically never change.
      */
     public String getUUID() {
-        return UUID;
+        return uuid;
     }
 
     /**
