@@ -1,6 +1,9 @@
+import org.jreleaser.model.Active
+
 plugins {
     `java-library`
     `maven-publish`
+    id("org.jreleaser") version "1.17.0"
 }
 
 group = "io.github.ArchipelagoMW"
@@ -115,6 +118,23 @@ publishing {
                 artifact(tasks.jar)
                 artifact(sourcesJar)
                 artifact(javadocJar)
+            }
+        }
+    }
+}
+
+jreleaser {
+    deploy {
+        maven {
+            mavenCentral {
+                register("javaClient") {
+                    dryrun = true
+                    active = Active.RELEASE
+                    applyMavenCentralRules = true
+                    sign = false
+                    stagingRepository("target/staging-deploy")
+                }
+
             }
         }
     }
