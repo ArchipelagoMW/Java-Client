@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.ArchipelagoMW"
-version = "0.1.20-SNAPSHOT"
+version = "0.1.20"
 
 repositories {
     mavenCentral()
@@ -74,6 +74,9 @@ publishing {
             repositories {
                 // For the time being
                 mavenLocal()
+                maven {
+                    url = uri(layout.buildDirectory.dir("staging-deploy"))
+                }
             }
             pom {
                 name = "Archipelago Java Library"
@@ -124,17 +127,27 @@ publishing {
 }
 
 jreleaser {
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    release {
+        github {
+            enabled = true
+            repoOwner = "ArchipelagoMW"
+            overwrite = false
+            skipRelease = true
+        }
+    }
     deploy {
         maven {
             mavenCentral {
                 register("javaClient") {
-                    dryrun = true
-                    active = Active.RELEASE
+                    active = Active.ALWAYS
                     applyMavenCentralRules = true
-                    sign = false
-                    stagingRepository("target/staging-deploy")
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
                 }
-
             }
         }
     }
