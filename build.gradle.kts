@@ -74,13 +74,14 @@ publishing {
             }
             pom {
                 name = "Archipelago Java Library"
-                description = "Library to connect to an Archipelago Server"
+                description = "Java library to connect to an Archipelago Server"
                 url = "https://github.com/ArchipelagoMW/Java-Client"
                 scm {
                     connection = "scm:git://github.com/ArchipelagoMW/Java-Client"
                     developerConnection = "scm:git:https://github.com/ArchipelagoMW/Java-Client.git"
                     url = "https://github.com/ArchipelagoMW/Java-Client"
                 }
+                inceptionYear = "2021"
                 licenses {
                     license {
                         name = "MIT License"
@@ -90,14 +91,23 @@ publishing {
                 }
                 developers {
                     developer {
-                        name = "Kono Tyran"
-                        email = "Kono@koifysh.dev"
+                        name = "PlatanoBailando"
+                        email = "cjmang@gmail.com"
                     }
                     developer {
+                        name = "digiholic"
+                    }
+                }
+                contributors {
+                    contributor {
+                        name = "Kono Tyran"
+                        roles.add("Author")
+                    }
+                    contributor {
                         name = "mattman107"
                     }
-                    developer {
-                        name = "PlatanoBailando"
+                    contributor {
+                        name = "charlesfire"
                     }
                 }
             }
