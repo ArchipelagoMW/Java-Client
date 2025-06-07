@@ -11,6 +11,8 @@ public class SetReplyPacket extends APPacket {
     public Object value;
     @SerializedName("original_value")
     public Object original_Value;
+    @SerializedName("slot")
+    public int slot;
     @SerializedName("request_id")
     public int requestID;
 

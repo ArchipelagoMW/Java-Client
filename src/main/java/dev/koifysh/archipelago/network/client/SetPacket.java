@@ -92,7 +92,10 @@ public class SetPacket extends APPacket {
      * {@link #OR},
      * {@link #XOR},
      * {@link #LEFT_SHIFT},
-     * {@link #RIGHT_SHIFT}
+     * {@link #RIGHT_SHIFT},
+     * {@link #REMOVE},
+     * {@link #POP},
+     * {@link #UPDATE}
      */
     public enum Operation {
         /**

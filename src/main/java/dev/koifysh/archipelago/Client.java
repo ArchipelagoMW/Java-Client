@@ -10,9 +10,13 @@ import dev.koifysh.archipelago.parts.Version;
 import dev.koifysh.archipelago.network.client.*;
 import org.apache.hc.core5.net.URIBuilder;
 
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -20,7 +24,34 @@ public abstract class Client {
 
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
 
-    private final String dataPackageLocation = "./APData/DataPackage.ser";
+    private static String OS = System.getProperty("os.name").toLowerCase();
+
+    private static final Path windowsDataPackageCache;
+    
+    private static final Path otherDataPackageCache;
+    
+    static
+    {
+        String appData = System.getenv("LOCALAPPDATA");
+        String winHome = System.getenv("USERPROFILE");
+        String userHome = System.getProperty("user.home");
+
+        if(appData  == null || appData.isEmpty()) {
+            windowsDataPackageCache = Paths.get(winHome, "appdata","local","Archipelago","cache","datapackage");
+        } else {
+            windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
+        }
+        
+        otherDataPackageCache =  Paths.get(userHome, ".cache", "Archipelago", "datapackage");
+    }
+
+    private static Path dataPackageLocation;
+
+    protected Map<String,String> versions;
+
+    protected ArrayList<String> games;
+
+    private final static Gson gson = new Gson();
 
     private int hintPoints;
 
@@ -40,7 +71,7 @@ public abstract class Client {
     private final ItemManager itemManager;
     private final EventManager eventManager;
 
-    public static final Version protocolVersion = new Version(0, 4, 7);
+    public static final Version protocolVersion = new Version(0, 6, 1);
 
     private int team;
     private int slot;
@@ -52,7 +83,16 @@ public abstract class Client {
     private int itemsHandlingFlags = 0b000;
 
     public Client() {
-        loadDataPackage();
+        //Determine what platform we are on
+        if(OS.startsWith("windows")){
+            dataPackageLocation = windowsDataPackageCache;
+        } else{
+            dataPackageLocation = otherDataPackageCache;
+        }
+
+        if(dataPackage == null){
+            dataPackage = new DataPackage();
+        }
 
         UUID = dataPackage.getUUID();
 
@@ -117,45 +157,84 @@ public abstract class Client {
     }
 
 
-    private void loadDataPackage() {
-        try {
-            FileInputStream fileInput = new FileInputStream(dataPackageLocation);
-            ObjectInputStream objectInput = new ObjectInputStream(fileInput);
+    protected void loadDataPackage() {
+        synchronized (Client.class){
+            File directoryPath = dataPackageLocation.toFile();
 
-            dataPackage = (DataPackage) objectInput.readObject();
-            fileInput.close();
-            objectInput.close();
+            //ensure the path to the cache exists
+            if(directoryPath.exists() && directoryPath.isDirectory()){
+                //loop through all Archipelago cache folders to find valid data package files 
+                Map<String,File> localGamesList = new HashMap<String,File>();
 
-        } catch (IOException e) {
-            LOGGER.info("no dataPackage found creating a new one.");
-            dataPackage = new DataPackage();
-            saveDataPackage();
-        } catch (ClassNotFoundException e) {
-            LOGGER.info("Failed to Read Previous datapackage. Creating new one.");
-            dataPackage = new DataPackage();
+                for(File gameDir : directoryPath.listFiles()){
+                    if(gameDir.isDirectory()){
+                        localGamesList.put(gameDir.getName(), gameDir);
+                    }
+                }
+
+                if(localGamesList.isEmpty()){
+                    //cache doesn't exist. Create the filepath
+                    boolean success = directoryPath.mkdirs();
+                    if(success){
+                        LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
+                    } else{
+                        LOGGER.severe("Failed to make directories for datapackage cache.");
+                    }
+                    return;
+                }
+
+                for(String gameName : games) {
+                    File dir = localGamesList.get(gameName);
+                    
+                    if(null == dir){
+                        continue;
+                    }
+                    
+                    //check all checksums
+                    for(File version : dir.listFiles()){
+                        String versionStr = versions.get(gameName);
+                        if(versionStr != null && versionStr.equals(version.getName())) {
+                            try(FileReader reader = new FileReader(version)){
+                                updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                                LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
+                            } catch (IOException e){
+                                LOGGER.info("Failed to read a datapackage. Starting with a new one.");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
-    void saveDataPackage() {
-        try {
-            File dataPackageFile = new File(dataPackageLocation);
+    public void saveDataPackage() {
+        synchronized (Client.class){
+            //Loop through games to ensure we have folders for each of them in the cache
+            for(String gameName : games){
+                File gameFolder = dataPackageLocation.resolve(gameName).toFile();
+                if(!gameFolder.exists()){
+                    //game folder not found. Make it
+                    gameFolder.mkdirs();
+                }
 
-            //noinspection ResultOfMethodCallIgnored
-            dataPackageFile.getParentFile().mkdirs();
-            //noinspection ResultOfMethodCallIgnored
-            dataPackageFile.createNewFile();
+                //save the datapackage
+                String gameVersion = versions.get(gameName); 
+                if(gameVersion == null) { 
+                    continue; 
+                }
 
-            FileOutputStream fileOut = new FileOutputStream(dataPackageFile);
-            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+                //if key is for this game
+                File filePath = dataPackageLocation.resolve(gameName).resolve(gameVersion).toFile();
 
-            objectOut.writeObject(dataPackage);
+                try (Writer writer = new FileWriter(filePath)){
+                    //if game is in list of games, save it
+                    gson.toJson(dataPackage.getGame(gameName), writer);
+                    LOGGER.info("Saving datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(gameVersion));
+                } catch (IOException e) {
+                    LOGGER.warning("unable to save DataPackage.");
+                }
 
-
-            fileOut.close();
-            objectOut.close();
-
-        } catch (IOException e) {
-            LOGGER.warning("unable to save DataPackage.");
+            }
         }
     }
 
@@ -517,6 +596,21 @@ public abstract class Client {
      *         <td> item_name_groups_{game_name} </td>
      *         <td> dict[str, list[str]] </td>
      *         <td> item_name_groups belonging to the requested game. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> location_name_groups_{game_name} </td>
+     *         <td> dict[str, list[str]] </td>
+     *         <td> location_name_groups belonging to the requested game. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> client_status_{team}_{slot} </td>
+     *         <td> ClientStatus </td>
+     *         <td> The current game status of the requested player. </td>
+     *     </tr>
+     *     <tr>
+     *         <td> race_mode </td>
+     *         <td> int </td>
+     *         <td> 0 if race mode is disabled, and 1 if it's enabled. </td>
      *     </tr>
      * </table>
      *

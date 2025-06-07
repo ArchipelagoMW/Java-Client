@@ -52,5 +52,7 @@ public enum APPacketType {
     @SerializedName("SetReply")
     SetReply,
     @SerializedName("InvalidPacket")
-    InvalidPacket
+    InvalidPacket,
+    @SerializedName("UpdateHint")
+    UpdateHint
 }
