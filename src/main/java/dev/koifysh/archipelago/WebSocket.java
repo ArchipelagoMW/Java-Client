@@ -154,7 +154,6 @@ class WebSocket extends WebSocketClient {
                     case DataPackage:
                         JsonElement data = packet.getAsJsonObject().get("data");
                         DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
-                        dataPackage.uuid = client.getUUID();
                         client.updateDataPackage(dataPackage);
                         client.saveDataPackage();
                         break;
