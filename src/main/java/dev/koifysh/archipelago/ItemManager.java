@@ -18,7 +18,7 @@ public class ItemManager {
     private final Client client;
     private WebSocket webSocket;
 
-    private List<NetworkItem> receivedItems = new CopyOnWriteArrayList<>();
+    private List<NetworkItem> receivedItems = new ArrayList<>();
 
     private final AtomicInteger index = new AtomicInteger();
 
@@ -28,10 +28,12 @@ public class ItemManager {
 
     public void receiveItems(List<NetworkItem> ids, int index) {
         if (index == 0) {
-            receivedItems = new CopyOnWriteArrayList<>();
+            receivedItems = new ArrayList<>();
         }
         if (receivedItems.size() == index) {
-            receivedItems.addAll(ids);
+            synchronized (this) {
+                receivedItems.addAll(ids);
+            }
             DataPackage dp = client.getDataPackage();
             int myTeam = client.getTeam();
             for (int i = this.index.get(); i < receivedItems.size(); i++) {
@@ -53,7 +55,7 @@ public class ItemManager {
     }
 
     public void writeFromSave(List<NetworkItem> receivedItems, int index) {
-        this.receivedItems = new CopyOnWriteArrayList<>(receivedItems);
+        this.receivedItems = new ArrayList<>(receivedItems);
         this.index.set(index);
     }
 
@@ -66,13 +68,17 @@ public class ItemManager {
     }
 
     public List<NetworkItem> getReceivedItems() {
-        return receivedItems;
+        synchronized (this) {
+            return new ArrayList<>(receivedItems);
+        }
     }
 
     public List<Long> getReceivedItemIDs() {
         List<Long> ids = new ArrayList<>();
-        for (NetworkItem receivedItem : receivedItems) {
-            ids.add(receivedItem.itemID);
+        synchronized (this) {
+            for (NetworkItem receivedItem : receivedItems) {
+                ids.add(receivedItem.itemID);
+            }
         }
         return ids;
     }
