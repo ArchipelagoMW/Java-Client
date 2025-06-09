@@ -4,6 +4,7 @@ import dev.koifysh.archipelago.Client;
 import dev.koifysh.archipelago.events.DeathLinkEvent;
 import dev.koifysh.archipelago.network.client.BouncePacket;
 import dev.koifysh.archipelago.network.server.BouncedPacket;
+import dev.koifysh.archipelago.utils.AtomicDouble;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class DeathLinkHandler implements BouncedPacketHandler {
 
     private final Client client;
 
-    private double lastDeath = 0d;
+    private final AtomicDouble lastDeath = new AtomicDouble(0d);
 
     public DeathLinkHandler(Client client) {
         this.client = client;
@@ -30,19 +31,18 @@ public class DeathLinkHandler implements BouncedPacketHandler {
         DeathLinkEvent event = new DeathLinkEvent((String) data.get("source"),
                 (String) data.get("cause"),
                 (Double) data.getOrDefault("time", 0d));
-
-        if(Math.abs(lastDeath - event.time) <= 1e-6)
+        double recentDeath = lastDeath.getAndUpdate(d -> Math.max(d, event.time));
+        if(Math.abs(recentDeath - event.time) <= 1e-6)
         {
             // We already died, go away!
             return;
         }
-        lastDeath = Math.max(event.time, lastDeath);
         client.getEventManager().callEvent(event);
     }
 
     public void sendDeathLink(String source, String cause)
     {
-        lastDeath = (double)System.currentTimeMillis() / 1000D;
+        lastDeath.set((double)System.currentTimeMillis() / 1000D);
 
         BouncePacket deathLinkPacket = new BouncePacket();
         deathLinkPacket.tags = new String[]{DEATHLINK_TAG};
