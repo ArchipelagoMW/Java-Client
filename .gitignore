@@ -10,6 +10,8 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+.gradle
+build/
 
 ### IntelliJ IDEA ###
 .idea/
@@ -41,3 +43,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+# Ignore Gradle build output directory
+build

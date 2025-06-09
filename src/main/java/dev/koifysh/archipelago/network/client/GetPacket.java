@@ -8,6 +8,7 @@ import dev.koifysh.archipelago.network.APPacketType;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used to request a single or multiple values from the server's data storage, see the
@@ -16,6 +17,8 @@ import java.util.Random;
  */
 public class GetPacket extends APPacket {
 
+    private static final AtomicInteger requestIdGen = new AtomicInteger();
+
     /**
      * a list of keys to retrieve data for.
      */
@@ -23,12 +26,12 @@ public class GetPacket extends APPacket {
     public Collection<String> keys;
 
     @SerializedName("request_id")
-    private int requestID;
+    private final int requestID;
 
     public GetPacket(Collection<String> keys) {
         super(APPacketType.Get);
         this.keys = keys;
-        requestID = new Random().nextInt(Integer.MAX_VALUE);
+        requestID = requestIdGen.getAndIncrement();
     }
 
     public int getRequestID() {

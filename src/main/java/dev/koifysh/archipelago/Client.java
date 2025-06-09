@@ -12,6 +12,7 @@ import org.apache.hc.core5.net.URIBuilder;
 
 import com.google.gson.Gson;
 
+import javax.net.SocketFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -354,6 +355,13 @@ public abstract class Client {
     }
 
     /**
+     * Equivalent to {@link #connect(URI, boolean, SocketFactory)} socketFactory being null.
+     */
+    public void connect(URI address, boolean allowDowngrade) {
+        connect(address, allowDowngrade, null);
+    }
+
+    /**
      * Connects to an Archipelago server with previously provided info.
      * <br>
      * supply the following info before calling this method
@@ -369,13 +377,18 @@ public abstract class Client {
      * @param address address of the archipelago server.
      * @param allowDowngrade if set to false will prevent auto downgrade of ssl connection.
      */
-    public void connect(URI address, boolean allowDowngrade) {
+    public void connect(URI address, boolean allowDowngrade, SocketFactory socketFactory) {
         LOGGER.fine("attempting WebSocket connection to " + address.toString());
         webSocket = new WebSocket(address, this);
+        if(null != socketFactory)
+        {
+            webSocket.setSocketFactory(socketFactory);
+        }
         locationManager.setAPWebSocket(webSocket);
         itemManager.setAPWebSocket(webSocket);
         webSocket.connect(allowDowngrade);
     }
+
 
     /**
      * Sends a Chat message to all other connected Clients.
@@ -414,6 +427,12 @@ public abstract class Client {
     public void scoutLocations(ArrayList<Long> locationIDs) {
         locationIDs.removeIf( location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
         webSocket.scoutLocation(locationIDs);
+    }
+
+    public void scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
+    {
+        locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
+        webSocket.scoutlocations(locationIDs, createAsHint.value);
     }
 
     public abstract void onError(Exception ex);

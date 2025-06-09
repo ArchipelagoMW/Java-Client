@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages registering and calling events
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public class EventManager {
 
-    private final Map<Method, Object> registeredListeners = new HashMap<>();
+    private final Map<Method, Object> registeredListeners = new ConcurrentHashMap<>();
 
     /**
      * Use to register for Events that come from the Archipelago server.
@@ -24,7 +25,8 @@ public class EventManager {
      * @param listener the object containing a listener method.
      */
     public void registerListener(Object listener) {
-        for (Method method : listener.getClass().getMethods()) {
+        Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
+        for (Method method : methods) {
             if (isEventListenerMethod(listener, method)) continue;
 
             registeredListeners.put(method, listener);
@@ -38,7 +40,8 @@ public class EventManager {
      * @param listener the object containing a listener method.
      */
     public void unRegisterListener(Object listener) {
-        for (Method method : listener.getClass().getMethods()) {
+        Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
+        for (Method method : methods) {
             if (isEventListenerMethod(listener, method)) continue;
 
             registeredListeners.remove(method, listener);
