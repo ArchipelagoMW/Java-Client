@@ -35,4 +35,4 @@ jobs:
           # The content here needs to be the values of the public and secret key pair
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.gpgPublicKey }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.gpgSecretKey }}
-        run: gradlew jreleaserDeploy
+        run: ./gradlew jreleaserDeploy
