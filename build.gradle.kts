@@ -6,7 +6,7 @@ plugins {
     id("org.jreleaser") version "1.17.0"
 }
 
-group = "io.github.cjmang"
+group = "io.github.ArchipelagoMW"
 version = "0.1.20-rc1"
 
 repositories {
