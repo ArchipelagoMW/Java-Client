@@ -1,7 +1,10 @@
 package dev.koifysh.archipelago;
 
+import dev.koifysh.archipelago.bounce.BouncedManager;
+import dev.koifysh.archipelago.bounce.BouncedPacketHandler;
 import dev.koifysh.archipelago.events.RetrievedEvent;
 import dev.koifysh.archipelago.flags.ItemsHandling;
+import dev.koifysh.archipelago.bounce.DeathLinkHandler;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
 import dev.koifysh.archipelago.network.server.RoomInfoPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
@@ -76,6 +79,8 @@ public abstract class Client {
     private final LocationManager locationManager;
     private final ItemManager itemManager;
     private final EventManager eventManager;
+    private final BouncedManager bouncedManager;
+    private final DeathLinkHandler deathLinkHandler;
 
     private int team;
     private int slot;
@@ -97,6 +102,9 @@ public abstract class Client {
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
+        bouncedManager = new BouncedManager();
+        deathLinkHandler = new DeathLinkHandler(this);
+        bouncedManager.addHandler(deathLinkHandler);
         client = this;
     }
 
@@ -565,6 +573,14 @@ public abstract class Client {
     }
 
     /**
+     * @return the bounced packet handler
+     */
+    public BouncedManager getBouncedManager()
+    {
+        return bouncedManager;
+    }
+
+    /**
      * Uses DataStorage to save a value on the AP server.
      *
      */
@@ -639,5 +655,27 @@ public abstract class Client {
         webSocket.sendPacket(getPacket);
         return getPacket.getRequestID();
     }
+
+    /**
+     * Helper for sending a death link bounce packet. You can send these without enabling death link first, but it is frowned upon.
+     * @param source A String that is the name of the player sending the death link (does not have to be slot name)
+     * @param cause A String that is the cause of this death. may be empty.
+     */
+    public void sendDeathlink(String source, String cause)
+    {
+        deathLinkHandler.sendDeathLink(source, cause);
+    }
+
+    /**
+     * Enable or disable receiving death links.
+     * @param enabled set to TRUE to enable death links, FALSE to disable.
+     */
+    public void setDeathLinkEnabled(boolean enabled) {
+        if(enabled)
+            addTag(DeathLinkHandler.DEATHLINK_TAG);
+        else
+            removeTag(DeathLinkHandler.DEATHLINK_TAG);
+    }
+
 
 }

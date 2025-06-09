@@ -9,7 +9,6 @@ import dev.koifysh.archipelago.Print.APPrintJsonType;
 import dev.koifysh.archipelago.Print.APPrintPart;
 import dev.koifysh.archipelago.Print.APPrintType;
 import dev.koifysh.archipelago.flags.NetworkPlayer;
-import dev.koifysh.archipelago.helper.DeathLink;
 import dev.koifysh.archipelago.network.APPacket;
 import dev.koifysh.archipelago.network.ConnectionResult;
 import dev.koifysh.archipelago.network.client.*;
@@ -200,10 +199,10 @@ class WebSocket extends WebSocketClient {
                         break;
                     case Bounced:
                         BouncedPacket bounced = gson.fromJson(packet, BouncedPacket.class);
-                        if (bounced.tags.contains("DeathLink"))
-                            DeathLink.receiveDeathLink(bounced);
-                        else
+                        if(!client.getBouncedManager().handle(bounced))
+                        {
                             client.getEventManager().callEvent(new BouncedEvent(bounced.games, bounced.tags, bounced.slots, bounced.data));
+                        }
                         break;
                     case LocationInfo:
                         LocationInfoPacket locations = gson.fromJson(packet, LocationInfoPacket.class);
@@ -230,7 +229,7 @@ class WebSocket extends WebSocketClient {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warning("Error proccessing incoming packet: " + e.getMessage());
+            LOGGER.warning("Error processing incoming packet: " + e.getMessage());
             //e.printStackTrace();
         }
     }
