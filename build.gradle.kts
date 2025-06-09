@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.ArchipelagoMW"
-version = "0.1.20-rc1"
+version = "0.1.20-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -127,12 +127,6 @@ publishing {
 }
 
 jreleaser {
-    project {
-        snapshot {
-            // https://regex101.com/r/TYV89b/1
-            pattern = "^[^-]*-(SNAPSHOT|rc.*)"
-        }
-    }
     signing {
         active = Active.ALWAYS
         armored = true
