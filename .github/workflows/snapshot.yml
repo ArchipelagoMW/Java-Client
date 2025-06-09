@@ -2,13 +2,10 @@ name: Publish to Maven Central
 
 on:
   release:
-    types: [released]
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+    types: [prereleased]
 
 jobs:
   build:
-    if: github
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,13 +18,11 @@ jobs:
       - name: Build with Gradle
         # This just publishes to the local file system; jreleaser is responsible for uploading to maven central
         run: gradlew publish
-      - name: Upload to Maven Central
+      - name: Upload to Maven Central Snapshots
         env:
           # Needs to have access to the io.github.ArchipelagoMW namespace in maven central
-          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.mavenCentralUsername }}
-          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.mavenCentralToken }}
-#          JRELEASER_DEPLOY_MAVEN_NEXUS2_USERNAME: ${{ secrets.mavenCentralUsername }}
-#          JRELEASER_DEPLOY_MAVEN_NEXUS2_TOKEN: ${{ secrets.mavenCentralToken }}
+          JRELEASER_DEPLOY_MAVEN_NEXUS2_USERNAME: ${{ secrets.mavenCentralUsername }}
+          JRELEASER_DEPLOY_MAVEN_NEXUS2_TOKEN: ${{ secrets.mavenCentralToken }}
           # The content uploaded to maven central needs to be signed.  The public keys need to be published,
           # see https://central.sonatype.org/publish/requirements/gpg/#distributing-your-public-key for accepted
           # locations
