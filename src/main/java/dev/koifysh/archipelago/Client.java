@@ -5,6 +5,7 @@ import dev.koifysh.archipelago.flags.ItemsHandling;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
 import dev.koifysh.archipelago.network.server.RoomInfoPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
+import dev.koifysh.archipelago.parts.Game;
 import dev.koifysh.archipelago.parts.NetworkSlot;
 import dev.koifysh.archipelago.parts.Version;
 import dev.koifysh.archipelago.network.client.*;
@@ -82,6 +83,23 @@ public abstract class Client {
     private String alias;
     private Set<String> tags = new HashSet<>();
     private int itemsHandlingFlags = 0b000;
+
+    public static void main(String[] args) throws Exception {
+        Client client = new Client(){
+            @Override
+            public void onError(Exception ex) {
+                ex.printStackTrace();
+            }
+
+            @Override
+            public void onClose(String Reason, int attemptingReconnect) {
+                System.err.println(Reason);
+            }
+        };
+        client.setName("TheArchiSpire");
+        client.connect("archipelago.gg:37013");
+
+    }
 
     public Client() {
         //Determine what platform we are on
@@ -196,7 +214,8 @@ public abstract class Client {
                         String versionStr = versions.get(gameName);
                         if(versionStr != null && versionStr.equals(version.getName())) {
                             try(FileReader reader = new FileReader(version)){
-                                updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                                Game game = gson.fromJson(reader, Game.class);
+                                dataPackage.update(gameName, game);
                                 LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
                             } catch (IOException e){
                                 LOGGER.info("Failed to read a datapackage. Starting with a new one.");
