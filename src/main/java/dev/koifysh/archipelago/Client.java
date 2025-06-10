@@ -84,23 +84,6 @@ public abstract class Client {
     private Set<String> tags = new HashSet<>();
     private int itemsHandlingFlags = 0b000;
 
-    public static void main(String[] args) throws Exception {
-        Client client = new Client(){
-            @Override
-            public void onError(Exception ex) {
-                ex.printStackTrace();
-            }
-
-            @Override
-            public void onClose(String Reason, int attemptingReconnect) {
-                System.err.println(Reason);
-            }
-        };
-        client.setName("TheArchiSpire");
-        client.connect("archipelago.gg:37013");
-
-    }
-
     public Client() {
         //Determine what platform we are on
         if(OS.startsWith("windows")){
