@@ -74,6 +74,9 @@ publishing {
             repositories {
                 // For the time being
                 mavenLocal()
+                maven {
+                    url = uri(layout.buildDirectory.dir("staging-deploy"))
+                }
             }
             pom {
                 name = "Archipelago Java Library"
@@ -124,17 +127,40 @@ publishing {
 }
 
 jreleaser {
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    release {
+        github {
+            enabled = true
+            repoOwner = "ArchipelagoMW"
+            overwrite = false
+            skipRelease = true
+        }
+    }
     deploy {
         maven {
             mavenCentral {
-                register("javaClient") {
-                    dryrun = true
-                    active = Active.RELEASE
+                register("release-deploy") {
+                    // Turning off releases for testing purposes
+                    active = Active.NEVER
                     applyMavenCentralRules = true
-                    sign = false
-                    stagingRepository("target/staging-deploy")
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
                 }
-
+            }
+            nexus2 {
+                register("snapshot-deploy") {
+                    active = Active.SNAPSHOT
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+                    stagingRepository("build/staging-deploy")
+                }
             }
         }
     }
