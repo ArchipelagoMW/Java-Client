@@ -6,7 +6,7 @@ plugins {
     id("org.jreleaser") version "1.17.0"
 }
 
-group = "io.github.ArchipelagoMW"
+group = "io.github.archipelagomw"
 version = "0.1.20-SNAPSHOT"
 
 repositories {
