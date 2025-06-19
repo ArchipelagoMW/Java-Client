@@ -18,8 +18,9 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // Gson is indirectly exposed via slotdata helpers
+    api(libs.gson)
     implementation(libs.java.websocket)
-    implementation(libs.gson)
     implementation(libs.httpclient)
     implementation(libs.httpcore)
 }
@@ -143,7 +144,7 @@ jreleaser {
         maven {
             mavenCentral {
                 register("release-deploy") {
-                    // Turning off releases for testing purposes
+                    // Turning off releases; supposed to be turned on via environment variable
                     active = Active.NEVER
                     applyMavenCentralRules = true
                     url = "https://central.sonatype.com/api/v1/publisher"

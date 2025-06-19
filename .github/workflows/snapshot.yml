@@ -1,8 +1,10 @@
 name: Publish to Maven Central
 
 on:
-  release:
-    types: [prereleased]
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
 
 jobs:
   build:
