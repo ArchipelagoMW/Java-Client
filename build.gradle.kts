@@ -29,28 +29,10 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+    withJavadocJar()
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
-val sourcesJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-    ->
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
-
-val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-    ->
-    dependsOn.add(tasks.javadoc)
-    archiveClassifier.set("javadoc")
-    from(tasks.javadoc)
-}
-
-tasks {
-    artifacts {
-        archives(sourcesJar)
-        archives(javadocJar)
     }
 }
 
@@ -72,6 +54,7 @@ tasks.named<Javadoc>("javadoc") {
 publishing {
     publications {
         create<MavenPublication>("javaClient") {
+            from(components["java"])
             repositories {
                 // For the time being
                 mavenLocal()
@@ -117,11 +100,6 @@ publishing {
                         name = "charlesfire"
                     }
                 }
-            }
-            artifacts {
-                artifact(tasks.jar)
-                artifact(sourcesJar)
-                artifact(javadocJar)
             }
         }
     }
