@@ -189,7 +189,7 @@ public abstract class Client {
                     }
                 }
                 JsonElement uuidEle = data.get("uuid");
-                if(!uuidEle.isJsonNull())
+                if(uuidEle != null && !uuidEle.isJsonNull())
                 {
                     tmp = uuidEle.getAsString();
                 }
