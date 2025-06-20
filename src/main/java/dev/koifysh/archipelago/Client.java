@@ -1,5 +1,6 @@
 package dev.koifysh.archipelago;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.koifysh.archipelago.events.RetrievedEvent;
 import dev.koifysh.archipelago.flags.ItemsHandling;
@@ -187,8 +188,11 @@ public abstract class Client {
                         return uuid = UUID.randomUUID().toString();
                     }
                 }
-
-                tmp = data.get("uuid").getAsString();
+                JsonElement uuidEle = data.get("uuid");
+                if(!uuidEle.isJsonNull())
+                {
+                    tmp = uuidEle.getAsString();
+                }
                 if(tmp != null)
                 {
                     return uuid = tmp;
