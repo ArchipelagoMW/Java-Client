@@ -3,7 +3,7 @@ import org.jreleaser.model.Active
 plugins {
     `java-library`
     `maven-publish`
-    id("org.jreleaser") version "1.17.0"
+    id("org.jreleaser") version "1.18.0"
 }
 
 group = "io.github.archipelagomw"
