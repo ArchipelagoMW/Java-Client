@@ -1,5 +1,6 @@
 package dev.koifysh.archipelago;
 
+import com.google.gson.JsonObject;
 import dev.koifysh.archipelago.events.RetrievedEvent;
 import dev.koifysh.archipelago.flags.ItemsHandling;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
@@ -17,35 +18,47 @@ import javax.net.SocketFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Client {
 
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
 
-    private static String OS = System.getProperty("os.name").toLowerCase();
+    private static final String OS = System.getProperty("os.name").toLowerCase();
 
-    private static final Path windowsDataPackageCache;
-    
-    private static final Path otherDataPackageCache;
-    
+    private static final Path cachePath;
+    private static final Path datapackageCachePath;
+
     static
     {
         String appData = System.getenv("LOCALAPPDATA");
         String winHome = System.getenv("USERPROFILE");
         String userHome = System.getProperty("user.home");
 
-        if(appData  == null || appData.isEmpty()) {
-            windowsDataPackageCache = Paths.get(winHome, "appdata","local","Archipelago","cache","datapackage");
-        } else {
-            windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
+        if(OS.startsWith("windows"))
+        {
+            if(appData  == null || appData.isEmpty()) {
+                cachePath = Paths.get(winHome, "appdata", "local", "Archipelago", "Cache");
+            } else {
+                cachePath = Paths.get(appData, "Archipelago", "Cache");
+            }
         }
-        
-        otherDataPackageCache =  Paths.get(userHome, ".cache", "Archipelago", "datapackage");
+        else
+        {
+            cachePath = Paths.get(userHome, ".cache", "Archipelago");
+        }
+        datapackageCachePath = cachePath.resolve("datapackage");
+
     }
+
+    private static String uuid = null;
 
     private static Path dataPackageLocation;
 
@@ -61,11 +74,9 @@ public abstract class Client {
 
     private String password;
 
-    private final String UUID;
-
     private RoomInfoPacket roomInfo;
 
-    private DataPackage dataPackage;
+    private final DataPackage dataPackage;
 
     public static Client client;
 
@@ -85,19 +96,8 @@ public abstract class Client {
     private int itemsHandlingFlags = 0b000;
 
     public Client() {
-        //Determine what platform we are on
-        if(OS.startsWith("windows")){
-            dataPackageLocation = windowsDataPackageCache;
-        } else{
-            dataPackageLocation = otherDataPackageCache;
-        }
-
-        if(dataPackage == null){
-            dataPackage = new DataPackage();
-        }
-
-        UUID = dataPackage.getUUID();
-
+        dataPackageLocation = datapackageCachePath;
+        dataPackage = new DataPackage();
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
@@ -158,6 +158,57 @@ public abstract class Client {
         }
     }
 
+
+    /**
+     * Gets the UUID of clients on this machine
+     * @return UUID of the client, this should theoretically never change.
+     */
+    public static String getUUID() {
+        if(uuid == null)
+        {
+            synchronized (DataPackage.class)
+            {
+                if(uuid != null) {
+                    return uuid;
+                }
+                String tmp = null;
+                File common = cachePath.resolve("common.json").toFile();
+                JsonObject data = new JsonObject();
+                if(common.exists())
+                {
+                    try(BufferedReader reader = Files.newBufferedReader(common.toPath(), StandardCharsets.UTF_8))
+                    {
+                        data = gson.fromJson(reader, JsonObject.class);
+                    }
+                    catch(IOException ex)
+                    {
+                        LOGGER.log(Level.WARNING,"Failed to load common uuid", ex);
+                        // We probably will fail to write
+                        return uuid = UUID.randomUUID().toString();
+                    }
+                }
+
+                tmp = data.get("uuid").getAsString();
+                if(tmp != null)
+                {
+                    return uuid = tmp;
+                }
+
+                tmp = UUID.randomUUID().toString();
+                data.addProperty("uuid", uuid);
+                try(BufferedWriter writer = Files.newBufferedWriter(common.toPath(),StandardCharsets.UTF_8))
+                {
+                    writer.write(gson.toJson(data));
+                }
+                catch(IOException ex)
+                {
+                    LOGGER.log(Level.WARNING,"Failed to save common uuid", ex);
+                }
+                return uuid = tmp;
+            }
+        }
+        return uuid;
+    }
 
     protected void loadDataPackage() {
         synchronized (Client.class){
@@ -473,14 +524,6 @@ public abstract class Client {
      */
     public void reconnect() {
         webSocket.reconnect();
-    }
-
-    /**
-     * Gets the UUID of this client.
-     * @return UUID of the client, this should theoretically never change.
-     */
-    public String getUUID() {
-        return UUID;
     }
 
     /**

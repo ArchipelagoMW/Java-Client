@@ -3,6 +3,7 @@ package dev.koifysh.archipelago.parts;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ public class DataPackage implements Serializable {
     @SerializedName("games")
     HashMap<String, Game> games = new HashMap<>();
 
-    public String uuid = UUID.randomUUID().toString();
 
     public String getItem(long itemID, String game) {
         if (!games.containsKey(game))
@@ -51,9 +51,6 @@ public class DataPackage implements Serializable {
     }
 
 
-    public String getUUID() {
-        return uuid;
-    }
 
     public void update(DataPackage newData) {
         games.putAll(newData.getGames());

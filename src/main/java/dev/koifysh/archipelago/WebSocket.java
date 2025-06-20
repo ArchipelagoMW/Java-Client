@@ -98,7 +98,7 @@ class WebSocket extends WebSocketClient {
                         connectPacket.version = Client.protocolVersion;
                         connectPacket.name = client.getMyName();
                         connectPacket.password = (client.getPassword() == null) ? "" : client.getPassword();
-                        connectPacket.uuid = client.getUUID();
+                        connectPacket.uuid = Client.getUUID();
                         connectPacket.game = client.getGame();
                         connectPacket.tags = client.getTags();
                         connectPacket.itemsHandling = client.getItemsHandlingFlags();
@@ -154,7 +154,6 @@ class WebSocket extends WebSocketClient {
                     case DataPackage:
                         JsonElement data = packet.getAsJsonObject().get("data");
                         DataPackage dataPackage = gson.fromJson(data, DataPackage.class);
-                        dataPackage.uuid = client.getUUID();
                         client.updateDataPackage(dataPackage);
                         client.saveDataPackage();
                         break;
