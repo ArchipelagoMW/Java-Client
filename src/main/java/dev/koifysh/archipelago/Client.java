@@ -199,7 +199,7 @@ public abstract class Client {
                 }
 
                 tmp = UUID.randomUUID().toString();
-                data.addProperty("uuid", uuid);
+                data.addProperty("uuid", tmp);
                 try(BufferedWriter writer = Files.newBufferedWriter(common.toPath(),StandardCharsets.UTF_8))
                 {
                     writer.write(gson.toJson(data));
