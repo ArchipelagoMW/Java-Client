@@ -8,6 +8,7 @@ import dev.koifysh.archipelago.bounce.DeathLinkHandler;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
 import dev.koifysh.archipelago.network.server.RoomInfoPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
+import dev.koifysh.archipelago.parts.Game;
 import dev.koifysh.archipelago.parts.NetworkSlot;
 import dev.koifysh.archipelago.parts.Version;
 import dev.koifysh.archipelago.network.client.*;
@@ -200,7 +201,8 @@ public abstract class Client {
                         String versionStr = versions.get(gameName);
                         if(versionStr != null && versionStr.equals(version.getName())) {
                             try(FileReader reader = new FileReader(version)){
-                                updateDataPackage(gson.fromJson(reader, DataPackage.class));
+                                Game game = gson.fromJson(reader, Game.class);
+                                dataPackage.update(gameName, game);
                                 LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
                             } catch (IOException e){
                                 LOGGER.info("Failed to read a datapackage. Starting with a new one.");

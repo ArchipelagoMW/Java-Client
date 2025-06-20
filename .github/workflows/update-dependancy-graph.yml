@@ -16,6 +16,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+          cache: gradle
       - name: Submit Dependency Snapshot
-        uses: advanced-security/maven-dependency-submission-action@v4
+        uses: gradle/actions/dependency-submission@v4

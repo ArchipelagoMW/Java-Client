@@ -48,4 +48,9 @@ public class DataPackage implements Serializable {
     public void update(DataPackage newData) {
         games.putAll(newData.getGames());
     }
+
+    public void update(String name, Game game)
+    {
+        games.put(name, game);
+    }
 }

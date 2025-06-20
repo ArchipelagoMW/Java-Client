@@ -6,8 +6,8 @@ plugins {
     id("org.jreleaser") version "1.17.0"
 }
 
-group = "io.github.ArchipelagoMW"
-version = "0.1.20"
+group = "io.github.archipelagomw"
+version = "0.1.20-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -18,8 +18,9 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // Gson is indirectly exposed via slotdata helpers
+    api(libs.gson)
     implementation(libs.java.websocket)
-    implementation(libs.gson)
     implementation(libs.httpclient)
     implementation(libs.httpcore)
 }
@@ -142,10 +143,23 @@ jreleaser {
     deploy {
         maven {
             mavenCentral {
-                register("javaClient") {
-                    active = Active.ALWAYS
+                register("release-deploy") {
+                    // Turning off releases; supposed to be turned on via environment variable
+                    active = Active.NEVER
                     applyMavenCentralRules = true
                     url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+            nexus2 {
+                register("snapshot-deploy") {
+                    active = Active.SNAPSHOT
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
                     stagingRepository("build/staging-deploy")
                 }
             }
