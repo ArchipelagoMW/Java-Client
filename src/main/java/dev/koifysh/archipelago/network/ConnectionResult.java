@@ -1,5 +1,5 @@
 package dev.koifysh.archipelago.network;
 
 public enum ConnectionResult {
-    Success,InvalidSlot, SlotAlreadyTaken, IncompatibleVersion, InvalidPassword
+    Success,InvalidSlot, SlotAlreadyTaken, IncompatibleVersion, InvalidPassword,InvalidGame
 }

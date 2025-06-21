@@ -1,7 +1,8 @@
 package dev.koifysh.archipelago;
 
 import dev.koifysh.archipelago.bounce.BouncedManager;
-import dev.koifysh.archipelago.bounce.BouncedPacketHandler;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import dev.koifysh.archipelago.events.RetrievedEvent;
 import dev.koifysh.archipelago.flags.ItemsHandling;
 import dev.koifysh.archipelago.bounce.DeathLinkHandler;
@@ -20,10 +21,13 @@ import javax.net.SocketFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Client {
@@ -31,29 +35,40 @@ public abstract class Client {
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
 
     public static final Version protocolVersion = new Version(0, 6, 1);
+    private final static Gson gson = new Gson();
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
 
-    private static final Path windowsDataPackageCache;
-    
-    private static final Path otherDataPackageCache;
-
-    private final static Gson gson = new Gson();
+    private static final Path cachePath;
+    private static final Path datapackageCachePath;
 
     static
     {
         String appData = System.getenv("LOCALAPPDATA");
-        String winHome = System.getenv("USERPROFILE");
         String userHome = System.getProperty("user.home");
+        String xdg = System.getenv("XDG_CACHE_HOME");
 
-        if(appData  == null || appData.isEmpty()) {
-            windowsDataPackageCache = Paths.get(winHome, "appdata","local","Archipelago","cache","datapackage");
-        } else {
-            windowsDataPackageCache = Paths.get(appData, "Archipelago", "cache", "datapackage");
+        if(OS.startsWith("windows"))
+        {
+            cachePath = Paths.get(appData, "Archipelago", "Cache");
         }
-        
-        otherDataPackageCache =  Paths.get(userHome, ".cache", "Archipelago", "datapackage");
+        else if(OS.startsWith("Mac") || OS.startsWith("Darwin"))
+        {
+            cachePath = Paths.get(userHome, "Library", "Caches", "Archipelago");
+        }
+        else if(xdg == null || xdg.isEmpty() )
+        {
+            cachePath = Paths.get(userHome, ".cache", "Archipelago");
+        }
+        else
+        {
+            cachePath = Paths.get(xdg, "Archipelago");
+        }
+        datapackageCachePath = cachePath.resolve("datapackage");
+
     }
+
+    private static String uuid = null;
 
     private static Path dataPackageLocation;
 
@@ -66,10 +81,6 @@ public abstract class Client {
     private WebSocket webSocket;
 
     private String password;
-
-    // TODO: migrate over to reading/writing from persistent storage; see CommonClient
-    // Supposed to uniquely identify the user
-    private final String uuid = UUID.randomUUID().toString();
 
     private RoomInfoPacket roomInfo;
 
@@ -93,13 +104,7 @@ public abstract class Client {
     private int itemsHandlingFlags = 0b000;
 
     public Client() {
-        //Determine what platform we are on
-        if(OS.startsWith("windows")){
-            dataPackageLocation = windowsDataPackageCache;
-        } else{
-            dataPackageLocation = otherDataPackageCache;
-        }
-
+        dataPackageLocation = datapackageCachePath;
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
@@ -163,50 +168,111 @@ public abstract class Client {
     }
 
 
+    /**
+     * Gets the UUID of clients on this machine
+     * @return UUID of the client, this should theoretically never change.
+     */
+    public static String getUUID() {
+        if(uuid == null)
+        {
+            synchronized (DataPackage.class)
+            {
+                if(uuid != null) {
+                    return uuid;
+                }
+                String tmp = null;
+                File common = cachePath.resolve("common.json").toFile();
+                JsonObject data = new JsonObject();
+                if(common.exists())
+                {
+                    try(BufferedReader reader = Files.newBufferedReader(common.toPath(), StandardCharsets.UTF_8))
+                    {
+                        data = gson.fromJson(reader, JsonObject.class);
+                    }
+                    catch(IOException ex)
+                    {
+                        LOGGER.log(Level.WARNING,"Failed to load common uuid", ex);
+                        // We probably will fail to write
+                        return uuid = UUID.randomUUID().toString();
+                    }
+                }
+                JsonElement uuidEle = data.get("uuid");
+                if(uuidEle != null && !uuidEle.isJsonNull())
+                {
+                    tmp = uuidEle.getAsString();
+                }
+                if(tmp != null)
+                {
+                    return uuid = tmp;
+                }
+
+                tmp = UUID.randomUUID().toString();
+                data.addProperty("uuid", tmp);
+                try(BufferedWriter writer = Files.newBufferedWriter(common.toPath(),StandardCharsets.UTF_8))
+                {
+                    writer.write(gson.toJson(data));
+                }
+                catch(IOException ex)
+                {
+                    LOGGER.log(Level.WARNING,"Failed to save common uuid", ex);
+                }
+                return uuid = tmp;
+            }
+        }
+        return uuid;
+    }
+
     protected void loadDataPackage() {
         synchronized (Client.class){
             File directoryPath = dataPackageLocation.toFile();
 
+            if(!directoryPath.exists())
+            {
+                boolean success = directoryPath.mkdirs();
+                if(success){
+                    LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
+                } else{
+                    LOGGER.severe("Failed to make directories for datapackage cache.");
+                }
+                return;
+            }
+
             //ensure the path to the cache exists
-            if(directoryPath.exists() && directoryPath.isDirectory()){
-                //loop through all Archipelago cache folders to find valid data package files 
-                Map<String,File> localGamesList = new HashMap<String,File>();
+            if(!directoryPath.isDirectory()) {
+                return;
+            }
+            //loop through all Archipelago cache folders to find valid data package files
+            Map<String,File> localGamesList = new HashMap<String,File>();
 
-                for(File gameDir : directoryPath.listFiles()){
-                    if(gameDir.isDirectory()){
-                        localGamesList.put(gameDir.getName(), gameDir);
-                    }
+            for(File gameDir : directoryPath.listFiles()){
+                if(gameDir.isDirectory()){
+                    localGamesList.put(gameDir.getName(), gameDir);
+                }
+            }
+
+            if(localGamesList.isEmpty()){
+                LOGGER.info("Datapackage is empty");
+                return;
+            }
+
+            for(String gameName : games) {
+                String safeName = Utils.getFileSafeName(gameName);
+                File dir = localGamesList.get(safeName);
+
+                if(null == dir){
+                    continue;
                 }
 
-                if(localGamesList.isEmpty()){
-                    //cache doesn't exist. Create the filepath
-                    boolean success = directoryPath.mkdirs();
-                    if(success){
-                        LOGGER.info("DataPackage directory didn't exist. Starting from a new one.");
-                    } else{
-                        LOGGER.severe("Failed to make directories for datapackage cache.");
-                    }
-                    return;
-                }
-
-                for(String gameName : games) {
-                    File dir = localGamesList.get(gameName);
-                    
-                    if(null == dir){
-                        continue;
-                    }
-                    
-                    //check all checksums
-                    for(File version : dir.listFiles()){
-                        String versionStr = versions.get(gameName);
-                        if(versionStr != null && versionStr.equals(version.getName())) {
-                            try(FileReader reader = new FileReader(version)){
-                                Game game = gson.fromJson(reader, Game.class);
-                                dataPackage.update(gameName, game);
-                                LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
-                            } catch (IOException e){
-                                LOGGER.info("Failed to read a datapackage. Starting with a new one.");
-                            }
+                //check all checksums
+                for(File version : dir.listFiles()){
+                    String versionStr = versions.get(gameName);
+                    if(versionStr != null && versionStr.equals(version.getName())) {
+                        try(FileReader reader = new FileReader(version)){
+                            Game game = gson.fromJson(reader, Game.class);
+                            dataPackage.update(gameName, game);
+                            LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
+                        } catch (IOException e){
+                            LOGGER.info("Failed to read a datapackage. Starting with a new one.");
                         }
                     }
                 }
@@ -218,7 +284,8 @@ public abstract class Client {
         synchronized (Client.class){
             //Loop through games to ensure we have folders for each of them in the cache
             for(String gameName : games){
-                File gameFolder = dataPackageLocation.resolve(gameName).toFile();
+                String safeName = Utils.getFileSafeName(gameName);
+                File gameFolder = dataPackageLocation.resolve(safeName).toFile();
                 if(!gameFolder.exists()){
                     //game folder not found. Make it
                     gameFolder.mkdirs();
@@ -231,7 +298,7 @@ public abstract class Client {
                 }
 
                 //if key is for this game
-                File filePath = dataPackageLocation.resolve(gameName).resolve(gameVersion).toFile();
+                File filePath = dataPackageLocation.resolve(safeName).resolve(gameVersion).toFile();
 
                 try (Writer writer = new FileWriter(filePath)){
                     //if game is in list of games, save it
@@ -477,14 +544,6 @@ public abstract class Client {
      */
     public void reconnect() {
         webSocket.reconnect();
-    }
-
-    /**
-     * Gets the UUID of this client.
-     * @return UUID of the client, this should theoretically never change.
-     */
-    public String getUUID() {
-        return uuid;
     }
 
     /**

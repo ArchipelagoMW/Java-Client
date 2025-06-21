@@ -97,7 +97,7 @@ class WebSocket extends WebSocketClient {
                         connectPacket.version = Client.protocolVersion;
                         connectPacket.name = client.getMyName();
                         connectPacket.password = (client.getPassword() == null) ? "" : client.getPassword();
-                        connectPacket.uuid = client.getUUID();
+                        connectPacket.uuid = Client.getUUID();
                         connectPacket.game = client.getGame();
                         connectPacket.tags = client.getTags();
                         connectPacket.itemsHandling = client.getItemsHandlingFlags();
@@ -229,8 +229,7 @@ class WebSocket extends WebSocketClient {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warning("Error processing incoming packet: " + e.getMessage());
-            //e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error processing incoming packet: ", e);
         }
     }
 
