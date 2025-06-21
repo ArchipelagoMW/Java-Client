@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SetPacket extends APPacket {
-    private static final AtomicInteger requestIdGen = new AtomicInteger();
+    private static final AtomicInteger requestIdGen = new AtomicInteger(1);
     /**
      * The key to manipulate. Can never start with "_read".
      */
