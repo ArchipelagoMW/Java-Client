@@ -6,30 +6,37 @@ import dev.koifysh.archipelago.parts.DataPackage;
 import dev.koifysh.archipelago.parts.NetworkItem;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemManager {
 
 
-    Client client;
-    WebSocket webSocket;
+    private final Client client;
+    private WebSocket webSocket;
 
-    ArrayList<NetworkItem> receivedItems = new ArrayList<>();
+    private List<NetworkItem> receivedItems = new ArrayList<>();
 
-    int index;
+    private final AtomicInteger index = new AtomicInteger();
 
     public ItemManager(Client client) {
         this.client = client;
     }
 
-    public void receiveItems(ArrayList<NetworkItem> ids, int index) {
+    public void receiveItems(List<NetworkItem> ids, int index) {
         if (index == 0) {
             receivedItems = new ArrayList<>();
         }
         if (receivedItems.size() == index) {
-            receivedItems.addAll(ids);
+            synchronized (this) {
+                receivedItems.addAll(ids);
+            }
             DataPackage dp = client.getDataPackage();
             int myTeam = client.getTeam();
-            for (int i = this.index; i < receivedItems.size(); i++) {
+            for (int i = this.index.get(); i < receivedItems.size(); i++) {
                 NetworkItem item = receivedItems.get(i);
                 item.itemName = dp.getItem(item.itemID, client.getGame());
                 item.locationName = dp.getLocation(item.locationID, client.getSlotInfo().get(item.playerID).game);
@@ -37,7 +44,7 @@ public class ItemManager {
                 client.getEventManager().callEvent(new ReceiveItemEvent(item, i+1));
             }
 
-            this.index = receivedItems.size();
+            this.index.set(receivedItems.size());
         }
         else {
             if(webSocket != null) {
@@ -47,27 +54,31 @@ public class ItemManager {
         }
     }
 
-    public void writeFromSave(ArrayList<NetworkItem> receivedItems, int index) {
-        this.receivedItems = receivedItems;
-        this.index = index;
+    public void writeFromSave(List<NetworkItem> receivedItems, int index) {
+        this.receivedItems = new ArrayList<>(receivedItems);
+        this.index.set(index);
     }
 
-    public void setAPWebSocket(WebSocket webSocket) {
+    void setAPWebSocket(WebSocket webSocket) {
         this.webSocket = webSocket;
     }
 
     public int getIndex() {
-        return index;
+        return index.get();
     }
 
-    public ArrayList<NetworkItem> getReceivedItems() {
-        return receivedItems;
+    public List<NetworkItem> getReceivedItems() {
+        synchronized (this) {
+            return new ArrayList<>(receivedItems);
+        }
     }
 
-    public ArrayList<Long> getReceivedItemIDs() {
-        ArrayList<Long> ids = new ArrayList<>();
-        for (NetworkItem receivedItem : receivedItems) {
-            ids.add(receivedItem.itemID);
+    public List<Long> getReceivedItemIDs() {
+        List<Long> ids = new ArrayList<>();
+        synchronized (this) {
+            for (NetworkItem receivedItem : receivedItems) {
+                ids.add(receivedItem.itemID);
+            }
         }
         return ids;
     }

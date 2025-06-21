@@ -9,10 +9,8 @@ import java.util.Map;
 
 public class DataPackage implements Serializable {
 
-    @Expose
     @SerializedName("games")
-    HashMap<String, Game> games = new HashMap<>();
-
+    private final Map<String, Game> games = new HashMap<>();
 
     public String getItem(long itemID, String game) {
         if (!games.containsKey(game))
@@ -20,7 +18,6 @@ public class DataPackage implements Serializable {
 
         if(!games.get(game).itemNameToId.containsValue(itemID))
             return String.format("Unknown Item [%d] for [%s]", itemID, game);
-
         return games.get(game).getItem(itemID);
     }
 
@@ -35,20 +32,18 @@ public class DataPackage implements Serializable {
     }
 
     public Map<String, String> getChecksums() {
-        HashMap<String, String> checksums = new HashMap<>();
+        Map<String, String> checksums = new HashMap<>();
         games.forEach((key, value) -> checksums.put(key, value.checksum));
         return checksums;
     }
 
-    public HashMap<String, Game> getGames() {
+    public Map<String, Game> getGames() {
         return games;
     }
 
     public Game getGame(String game) {
         return games.get(game);
     }
-
-
 
     public void update(DataPackage newData) {
         games.putAll(newData.getGames());

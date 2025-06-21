@@ -1,9 +1,11 @@
 package dev.koifysh.archipelago;
 
+import dev.koifysh.archipelago.bounce.BouncedManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.koifysh.archipelago.events.RetrievedEvent;
 import dev.koifysh.archipelago.flags.ItemsHandling;
+import dev.koifysh.archipelago.bounce.DeathLinkHandler;
 import dev.koifysh.archipelago.network.server.ConnectUpdatePacket;
 import dev.koifysh.archipelago.network.server.RoomInfoPacket;
 import dev.koifysh.archipelago.parts.DataPackage;
@@ -19,18 +21,21 @@ import javax.net.SocketFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Client {
 
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
+
+    public static final Version protocolVersion = new Version(0, 6, 1);
+    private final static Gson gson = new Gson();
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
 
@@ -69,9 +74,7 @@ public abstract class Client {
 
     protected Map<String,String> versions;
 
-    protected ArrayList<String> games;
-
-    private final static Gson gson = new Gson();
+    protected List<String> games;
 
     private int hintPoints;
 
@@ -81,31 +84,33 @@ public abstract class Client {
 
     private RoomInfoPacket roomInfo;
 
-    private final DataPackage dataPackage;
+    private final DataPackage dataPackage = new DataPackage();
 
     public static Client client;
 
     private final LocationManager locationManager;
     private final ItemManager itemManager;
     private final EventManager eventManager;
-
-    public static final Version protocolVersion = new Version(0, 6, 1);
+    private final BouncedManager bouncedManager;
+    private final DeathLinkHandler deathLinkHandler;
 
     private int team;
     private int slot;
-    private HashMap<Integer, NetworkSlot> slotInfo;
+    private Map<Integer, NetworkSlot> slotInfo;
     private String name = "Name not set";
     private String game = "Game not set";
     private String alias;
-    private Set<String> tags = new HashSet<>();
+    private final Set<String> tags = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private int itemsHandlingFlags = 0b000;
 
     public Client() {
         dataPackageLocation = datapackageCachePath;
-        dataPackage = new DataPackage();
         eventManager = new EventManager();
         locationManager = new LocationManager(this);
         itemManager = new ItemManager(this);
+        bouncedManager = new BouncedManager();
+        deathLinkHandler = new DeathLinkHandler(this);
+        bouncedManager.addHandler(deathLinkHandler);
         client = this;
     }
 
@@ -124,7 +129,8 @@ public abstract class Client {
      */
     public void setTags(Set<String> tags) {
         if (!this.tags.equals(tags)) {
-            this.tags = tags;
+            this.tags.clear();
+            this.tags.addAll(tags);
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -138,8 +144,7 @@ public abstract class Client {
      * @param tag String tag to be added.
      */
     public void addTag(String tag) {
-        if (!this.tags.contains(tag)) {
-            tags.add(tag);
+        if(tags.add(tag)) {
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -153,8 +158,7 @@ public abstract class Client {
      * @param tag String tag to be removed.
      */
     public void removeTag(String tag) {
-        if (this.tags.contains(tag)) {
-            tags.remove(tag);
+        if(tags.remove(tag)) {
             if (isConnected()) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
@@ -352,7 +356,7 @@ public abstract class Client {
         this.team = team;
     }
 
-    void setSlotInfo(HashMap<Integer, NetworkSlot> slotInfo) {
+    void setSlotInfo(Map<Integer, NetworkSlot> slotInfo) {
         this.slotInfo = slotInfo;
     }
 
@@ -388,7 +392,7 @@ public abstract class Client {
         return roomInfo;
     }
 
-    public HashMap<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
+    public Map<Integer, NetworkSlot> getSlotInfo() {return slotInfo;}
 
     /**
      * Works exactly like {@link #connect(URI, boolean)} with allowDowngrade set to true;
@@ -630,6 +634,14 @@ public abstract class Client {
     }
 
     /**
+     * @return the bounced packet handler
+     */
+    public BouncedManager getBouncedManager()
+    {
+        return bouncedManager;
+    }
+
+    /**
      * Uses DataStorage to save a value on the AP server.
      *
      */
@@ -704,5 +716,27 @@ public abstract class Client {
         webSocket.sendPacket(getPacket);
         return getPacket.getRequestID();
     }
+
+    /**
+     * Helper for sending a death link bounce packet. You can send these without enabling death link first, but it is frowned upon.
+     * @param source A String that is the name of the player sending the death link (does not have to be slot name)
+     * @param cause A String that is the cause of this death. may be empty.
+     */
+    public void sendDeathlink(String source, String cause)
+    {
+        deathLinkHandler.sendDeathLink(source, cause);
+    }
+
+    /**
+     * Enable or disable receiving death links.
+     * @param enabled set to TRUE to enable death links, FALSE to disable.
+     */
+    public void setDeathLinkEnabled(boolean enabled) {
+        if(enabled)
+            addTag(DeathLinkHandler.DEATHLINK_TAG);
+        else
+            removeTag(DeathLinkHandler.DEATHLINK_TAG);
+    }
+
 
 }
