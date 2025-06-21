@@ -42,18 +42,27 @@ public abstract class Client {
         String appData = System.getenv("LOCALAPPDATA");
         String winHome = System.getenv("USERPROFILE");
         String userHome = System.getProperty("user.home");
+        String xdg = System.getenv("XDG_CACHE_HOME");
 
         if(OS.startsWith("windows"))
         {
             if(appData  == null || appData.isEmpty()) {
-                cachePath = Paths.get(winHome, "appdata", "local", "Archipelago", "Cache");
+                cachePath = Paths.get(winHome, "AppData", "Local", "Archipelago", "Cache");
             } else {
                 cachePath = Paths.get(appData, "Archipelago", "Cache");
             }
         }
-        else
+        else if(OS.startsWith("Mac") || OS.startsWith("Darwin"))
+        {
+            cachePath = Paths.get(userHome, "Library", "Caches", "Archipelago");
+        }
+        else if(xdg == null || xdg.isEmpty() )
         {
             cachePath = Paths.get(userHome, ".cache", "Archipelago");
+        }
+        else
+        {
+            cachePath = Paths.get(xdg, "Archipelago");
         }
         datapackageCachePath = cachePath.resolve("datapackage");
 
