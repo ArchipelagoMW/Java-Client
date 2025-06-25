@@ -122,8 +122,7 @@ jreleaser {
         maven {
             mavenCentral {
                 register("release-deploy") {
-                    // Turning off releases; supposed to be turned on via environment variable
-                    active = Active.NEVER
+                    // Releases intended to be turned on via environment variable
                     applyMavenCentralRules = true
                     url = "https://central.sonatype.com/api/v1/publisher"
                     stagingRepository("build/staging-deploy")
