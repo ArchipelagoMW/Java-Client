@@ -1,6 +1,6 @@
 Archipelago Java Client
 =======================
-[![Maven Central Version](https://img.shields.io/maven-central/v/dev.koifysh/archipelago-client)](https://central.sonatype.com/artifact/dev.koifysh/archipelago-client)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.archipelagomw/Java-Client)](https://central.sonatype.com/artifact/io.github.archipelagomw/Java-Client)
 
 A java client Library to connect to an [Archipelago](http://github.com/ArchipelagoMW/Archipelago) Server.
 
