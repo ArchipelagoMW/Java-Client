@@ -37,7 +37,6 @@ jobs:
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.gpgSecretKey }}
           # Overrides the configuration of 'NEVER'
           JRELEASER_DEPLOY_MAVEN_MAVENCENTRAL_RELEASE_DEPLOY_ACTIVE: 'RELEASE'
-          JRELEASER_DEPLOY_MAVEN_MAVENCENTRAL_SNAPSHOT_DEPLOY_ACTIVE: 'NEVER'
         run: ./gradlew jreleaserDeploy
       - name: Store JReleaser Logs
         if: failure()
