@@ -12,9 +12,9 @@ Use the following Code snippits to add this library to your project using the fo
 To use maven add this dependency to your `pom.xml`:
 ```xml
 <dependency>
-    <groupId>dev.koifysh</groupId>
-    <artifactId>archipelago-client</artifactId>
-    <version>0.1.19</version>
+    <groupId>io.github.archipelagomw</groupId>
+    <artifactId>Java-Client</artifactId>
+    <version>0.1.20</version>
 </dependency>
 ```
 
@@ -22,7 +22,7 @@ To use maven add this dependency to your `pom.xml`:
 To use Gradle add the maven central repository to your repositories list:
 then add this to your `dependancy` section
 ```groovy
-implementation 'dev.koifysh:archipelago-client:0.1.19'
+implementation 'io.github.archipelagomw:Java-Client:0.1.20'
 ```
 
 ## Using Snapshots
