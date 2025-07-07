@@ -3,7 +3,7 @@
 
 [versions]
 junit-jupiter = "5.13.3"
-java-websocket = "1.5.7"
+java-websocket = "1.6.0"
 gson = "2.13.1"
 httpclient = "5.5"
 httpcore = "5.3.1"
