@@ -7,7 +7,6 @@ import io.github.archipelagomw.events.LocationInfoEvent;
 import io.github.archipelagomw.events.RetrievedEvent;
 import io.github.archipelagomw.flags.ItemsHandling;
 import io.github.archipelagomw.bounce.DeathLinkHandler;
-import dev.koifysh.archipelagomw.network.client.*;
 import io.github.archipelagomw.network.client.*;
 import io.github.archipelagomw.network.server.ConnectUpdatePacket;
 import io.github.archipelagomw.network.server.RoomInfoPacket;
@@ -15,7 +14,6 @@ import io.github.archipelagomw.parts.DataPackage;
 import io.github.archipelagomw.parts.Game;
 import io.github.archipelagomw.parts.NetworkSlot;
 import io.github.archipelagomw.parts.Version;
-import dev.koifysh.archipelago.network.client.*;
 import org.apache.hc.core5.net.URIBuilder;
 
 import com.google.gson.Gson;
