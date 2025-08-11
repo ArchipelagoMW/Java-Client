@@ -3,11 +3,11 @@ import org.jreleaser.model.Active
 plugins {
     `java-library`
     `maven-publish`
-    id("org.jreleaser") version "1.18.0"
+    id("org.jreleaser") version "1.19.0"
 }
 
 group = "io.github.archipelagomw"
-version = "0.1.20-SNAPSHOT"
+version = "0.1.21"
 
 repositories {
     mavenCentral()

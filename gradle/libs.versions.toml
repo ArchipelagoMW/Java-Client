@@ -2,11 +2,11 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-junit-jupiter = "5.13.3"
+junit-jupiter = "5.13.4"
 java-websocket = "1.6.0"
 gson = "2.13.1"
 httpclient = "5.5"
-httpcore = "5.3.1"
+httpcore = "5.3.4"
 
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
