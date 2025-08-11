@@ -14,7 +14,7 @@ To use maven add this dependency to your `pom.xml`:
 <dependency>
     <groupId>io.github.archipelagomw</groupId>
     <artifactId>Java-Client</artifactId>
-    <version>0.1.20</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -22,7 +22,7 @@ To use maven add this dependency to your `pom.xml`:
 To use Gradle add the maven central repository to your repositories list:
 then add this to your `dependancy` section
 ```groovy
-implementation 'io.github.archipelagomw:Java-Client:0.1.20'
+implementation 'io.github.archipelagomw:Java-Client:0.2.0'
 ```
 
 ## Using Snapshots
@@ -56,7 +56,7 @@ And add the snapshot version into your dependencies:
 <dependency>
     <groupId>io.github.archipelagomw</groupId>
     <artifactId>Java-Client</artifactId>
-    <version>0.1.20-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -84,5 +84,5 @@ repositories {
 
 And add the snapshot version into your dependencies:
 ```groovy
-implementation 'io.github.archipelagomw:Java-Client:0.1.20-SNAPSHOT'
+implementation 'io.github.archipelagomw:Java-Client:0.2.1-SNAPSHOT'
 ```
