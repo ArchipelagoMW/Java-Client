@@ -19,7 +19,7 @@ jobs:
           cache: gradle
       - name: Build with Gradle
         # This just publishes to the local file system; jreleaser is responsible for uploading to maven central
-        run: ./gradlew publish
+        run: ./gradlew publish -Psnapshot=true
       - name: Upload to Maven Central Snapshots
         env:
           # Needs to have access to the io.github.ArchipelagoMW namespace in maven central
