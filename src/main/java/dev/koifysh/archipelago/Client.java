@@ -300,7 +300,7 @@ public abstract class Client {
                 //if key is for this game
                 File filePath = dataPackageLocation.resolve(safeName).resolve(gameVersion).toFile();
 
-                try (Writer writer = new FileWriter(filePath)){
+                try (Writer writer = Files.newBufferedWriter(filePath.toPath(), StandardCharsets.UTF_8)){
                     //if game is in list of games, save it
                     gson.toJson(dataPackage.getGame(gameName), writer);
                     LOGGER.info("Saving datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(gameVersion));
