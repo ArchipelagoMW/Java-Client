@@ -127,45 +127,60 @@ public abstract class Client {
      * overwrite, and set all tags sent to the Archipelago server.
      * this will overwrite any previous tags that have been set.
      * @param tags a Set of tags to send.
+     * @return Whether the send was successful or not
      */
-    public void setTags(Set<String> tags) {
+    public APResult<Void> setTags(Set<String> tags) {
         if (!this.tags.equals(tags)) {
             this.tags.clear();
             this.tags.addAll(tags);
-            if (isConnected()) {
+            APResult<Void> ret = ensureConnectedAndAuth();
+            if(ret == null) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
+                ret = APResult.success();
             }
+            return ret;
         }
+        return APResult.success();
     }
 
     /**
      * add a tag to your list, keeping all previous tags intact.
      * @param tag String tag to be added.
+     * @return Whether the send was successful or not
      */
-    public void addTag(String tag) {
+    public APResult<Void> addTag(String tag) {
         if(tags.add(tag)) {
-            if (isConnected()) {
+            APResult<Void> ret = ensureConnectedAndAuth();
+            if(ret == null) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
+                ret = APResult.success();
             }
+            return ret;
         }
+        return APResult.success();
     }
 
     /**
      * removes supplied tag, if it exists.
      * @param tag String tag to be removed.
+     * @return Whether the send was successful or not
      */
-    public void removeTag(String tag) {
+    public APResult<Void> removeTag(String tag) {
         if(tags.remove(tag)) {
-            if (isConnected()) {
+            APResult<Void> ret = ensureConnectedAndAuth();
+            if(ret == null) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
+                ret = APResult.success();
             }
+            return ret;
         }
+        return APResult.success();
     }
 
 
@@ -467,46 +482,69 @@ public abstract class Client {
     /**
      * Sends a Chat message to all other connected Clients.
      * @param message Message to send.
+     * @return Whether the send was successful or not
      */
-    public void sendChat(String message) {
-        if (webSocket == null)
-            return;
-        if (webSocket.isAuthenticated()) {
+    public APResult<Void> sendChat(String message) {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null)
+        {
             webSocket.sendChat(message);
+            ret = APResult.success();
         }
+        return ret;
     }
 
     /**
      * inform the Archipelago server that a location ID has been checked.
      * @param locationID id of a location.
-     * @return true if packet was successfully sent. False if not connected or otherwise failed to send.
+     * @return Whether send was successful or not
      */
-    public boolean checkLocation(long locationID) {
+    public APResult<Void> checkLocation(long locationID) {
         return locationManager.checkLocation(locationID);
     }
 
     /**
      * inform the Archipelago server that a collection of location ID has been checked.
      * @param locationIDs a collection of a locations.
-     * @return true if packet was successfully sent. False if not connected or otherwise failed to send.
+     * @return Whether send was successful or not
      */
-    public boolean checkLocations(Collection<Long> locationIDs) {
+    public APResult<Void> checkLocations(Collection<Long> locationIDs) {
         return locationManager.checkLocations(locationIDs);
     }
 
     /**
      * Ask the server for information about what is in locations. you will get a response in the {@link LocationInfoEvent} event.
      * @param locationIDs List of location ID's to request info on.
+     * @return Whether the send was successful or not
      */
-    public void scoutLocations(ArrayList<Long> locationIDs) {
-        locationIDs.removeIf( location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
-        webSocket.scoutLocation(locationIDs);
+    public APResult<Void> scoutLocations(ArrayList<Long> locationIDs) {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null)
+        {
+            locationIDs.removeIf( location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
+            webSocket.scoutLocation(locationIDs);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
-    public void scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
+    /**
+     *
+     * Ask the server for information about what is in locations. you will get a response in the {@link LocationInfoEvent} event.
+     * @param locationIDs List of location ID's to request info on.
+     * @param createAsHint Whether to create hints for the provided locations
+     * @return Whether the send was successful or not
+     */
+    public APResult<Void> scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
     {
-        locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
-        webSocket.scoutlocations(locationIDs, createAsHint.value);
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null)
+        {
+            locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
+            webSocket.scoutlocations(locationIDs, createAsHint.value);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     public abstract void onError(Exception ex);
@@ -571,31 +609,58 @@ public abstract class Client {
         return itemManager;
     }
 
+    protected <T> APResult<T> ensureConnectedAndAuth()
+    {
+        if(!isConnected()) {
+            return APResult.disconnected();
+        }
+        if(!webSocket.isAuthenticated())
+        {
+            return APResult.unauthenticated();
+        }
+        return null;
+    }
     /**
      * Update the current game status.
      * @see ClientStatus
      *
      * @param status a {@link ClientStatus} to send to the server.
+     * @return Whether the send was successful or not
      */
-    public void setGameState(ClientStatus status) {
-        if (webSocket == null)
-            return;
-        if (webSocket.isAuthenticated())
+    public APResult<Void> setGameState(ClientStatus status) {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
             webSocket.sendPacket(new StatusUpdatePacket(status));
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     /**
      * manually trigger a resync to the Archipelago server. this should be done automatically if the library detects a desync.
+     * @return Whether the send was successful or not
      */
-    public void sync() {
-        webSocket.sendPacket(new SyncPacket());
+    public APResult<Void> sync() {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            webSocket.sendPacket(new SyncPacket());
+            ret = APResult.success();
+        }
+        return ret;
     }
 
-    public void sendBounce(BouncePacket bouncePacket) {
-        if (webSocket == null)
-            return;
-        if (webSocket.isAuthenticated())
+    /**
+     * sends a bouncepacket to the server, such as for deathlink
+     * @param bouncePacket The packet to send
+     * @return Whether the send was successful or not
+     */
+    public APResult<Void> sendBounce(BouncePacket bouncePacket) {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
             webSocket.sendPacket(bouncePacket);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     /**
@@ -644,25 +709,30 @@ public abstract class Client {
 
     /**
      * Uses DataStorage to save a value on the AP server.
-     *
+     * @return Whether the send was successful or not, and the requestId
      */
-    public int dataStorageSet(SetPacket setPacket) {
-        if (webSocket == null || !webSocket.isAuthenticated())
-            return 0;
-
-        webSocket.sendPacket(setPacket);
-        return setPacket.getRequestID();
+    public APResult<Integer> dataStorageSet(SetPacket setPacket) {
+        APResult<Integer> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            webSocket.sendPacket(setPacket);
+            ret = APResult.success(setPacket.getRequestID());
+        }
+        return ret;
     }
 
     /**
      * Registers to receive updates of when a key in the Datastorage has been changed on the server.
      *
      * @param keys List of Keys to be notified of.
+     * @return Whether the send was successful or not
      */
-    public void dataStorageSetNotify(Collection<String> keys) {
-        if (webSocket == null || !webSocket.isAuthenticated())
-            return;
-        webSocket.sendPacket(new SetNotifyPacket(keys));
+    public APResult<Void> dataStorageSetNotify(Collection<String> keys) {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            webSocket.sendPacket(new SetNotifyPacket(keys));
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     /**
@@ -708,35 +778,44 @@ public abstract class Client {
      * </table>
      *
      * @param keys a list of keys to retrieve values for
+     * @return Whether the send was successful or not, and the requestId
      */
-    public int dataStorageGet(Collection<String> keys) {
-        if (webSocket == null || !webSocket.isAuthenticated())
-            return 0;
-
+    public APResult<Integer> dataStorageGet(Collection<String> keys) {
         GetPacket getPacket = new GetPacket(keys);
-        webSocket.sendPacket(getPacket);
-        return getPacket.getRequestID();
+        APResult<Integer> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            webSocket.sendPacket(getPacket);
+            ret = APResult.success(getPacket.getRequestID());
+        }
+        return ret;
     }
 
     /**
      * Helper for sending a death link bounce packet. You can send these without enabling death link first, but it is frowned upon.
      * @param source A String that is the name of the player sending the death link (does not have to be slot name)
      * @param cause A String that is the cause of this death. may be empty.
+     * @return Whether the send was successful or not
      */
-    public void sendDeathlink(String source, String cause)
+    public APResult<Void> sendDeathlink(String source, String cause)
     {
-        deathLinkHandler.sendDeathLink(source, cause);
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            deathLinkHandler.sendDeathLink(source, cause);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     /**
      * Enable or disable receiving death links.
      * @param enabled set to TRUE to enable death links, FALSE to disable.
+     * @return Whether the send was successful or not
      */
-    public void setDeathLinkEnabled(boolean enabled) {
+    public APResult<Void> setDeathLinkEnabled(boolean enabled) {
         if(enabled)
-            addTag(DeathLinkHandler.DEATHLINK_TAG);
+            return addTag(DeathLinkHandler.DEATHLINK_TAG);
         else
-            removeTag(DeathLinkHandler.DEATHLINK_TAG);
+            return removeTag(DeathLinkHandler.DEATHLINK_TAG);
     }
 
 
