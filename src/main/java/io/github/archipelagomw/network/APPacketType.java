@@ -54,5 +54,7 @@ public enum APPacketType {
     @SerializedName("InvalidPacket")
     InvalidPacket,
     @SerializedName("UpdateHint")
-    UpdateHint
+    UpdateHint,
+    @SerializedName("CreateHints")
+    CreateHints,
 }

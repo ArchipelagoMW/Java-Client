@@ -819,6 +819,11 @@ public abstract class Client {
             return removeTag(DeathLinkHandler.DEATHLINK_TAG);
     }
 
+    /**
+     * Enables sending multiple packets at once.
+     * @param packets The packets to send
+     * @return Whether the send was successful
+     */
     public APResult<Void> sendPackets(List<APPacket> packets)
     {
         APResult<Void> ret = ensureConnectedAndAuth();
@@ -829,4 +834,43 @@ public abstract class Client {
         return ret;
     }
 
+    /**
+     * Creates hints for the provided locations
+     * @param locations The locations to hint for.
+     * @param player The id of the player whose locations are being hinted for
+     * @param status Sets the status of the hint to this status; server rejects HINT_FOUND
+     * @return Whether the send was successful
+     */
+    public APResult<Void> createHints(List<Long> locations, int player, HintStatus status)
+    {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null)
+        {
+            CreateHintPacket packet = new CreateHintPacket(locations, player, status);
+            webSocket.sendPacket(packet);
+            ret = APResult.success();
+        }
+        return ret;
+    }
+
+    /**
+     * Creates hints for the provided locations
+     * @param locations The locations to hint for.
+     * @param player The id of the player whose locations are being hinted for
+     * @return Whether the send was successful
+     */
+    public APResult<Void> createHints(List<Long> locations, int player)
+    {
+        return createHints(locations, player, HintStatus.HINT_UNSPECIFIED);
+    }
+
+    /**
+     * Creates hints for the provided locations with this client's slot
+     * @param locations The locations to hint for.
+     * @return Whether the send was successful
+     */
+    public APResult<Void> createHints(List<Long> locations)
+    {
+        return createHints(locations, client.slot, HintStatus.HINT_UNSPECIFIED);
+    }
 }
