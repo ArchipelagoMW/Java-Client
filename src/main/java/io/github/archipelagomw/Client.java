@@ -7,6 +7,7 @@ import io.github.archipelagomw.events.LocationInfoEvent;
 import io.github.archipelagomw.events.RetrievedEvent;
 import io.github.archipelagomw.flags.ItemsHandling;
 import io.github.archipelagomw.bounce.DeathLinkHandler;
+import io.github.archipelagomw.network.APPacket;
 import io.github.archipelagomw.network.client.*;
 import io.github.archipelagomw.network.server.ConnectUpdatePacket;
 import io.github.archipelagomw.network.server.RoomInfoPacket;
@@ -818,5 +819,14 @@ public abstract class Client {
             return removeTag(DeathLinkHandler.DEATHLINK_TAG);
     }
 
+    public APResult<Void> sendPackets(List<APPacket> packets)
+    {
+        APResult<Void> ret = ensureConnectedAndAuth();
+        if(ret == null) {
+            webSocket.sendManyPackets(packets);
+            ret = APResult.success();
+        }
+        return ret;
+    }
 
 }
