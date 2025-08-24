@@ -42,14 +42,15 @@ public class DeathLinkHandler implements BouncedPacketHandler {
 
     public void sendDeathLink(String source, String cause)
     {
-        lastDeath.set((double)System.currentTimeMillis() / 1000D);
+        double time = (double)System.currentTimeMillis() / 1000D;
+        lastDeath.set(time);
 
         BouncePacket deathLinkPacket = new BouncePacket();
         deathLinkPacket.tags = new String[]{DEATHLINK_TAG};
 
         HashMap<String, Object> data = new HashMap<>();
         data.put("cause",cause);
-        data.put("time", lastDeath);
+        data.put("time", time);
         data.put("source",source);
         deathLinkPacket.setData(data);
 
