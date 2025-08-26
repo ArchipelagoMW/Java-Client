@@ -283,8 +283,15 @@ public abstract class Client {
                 //check all checksums
                 for(File version : dir.listFiles()){
                     String versionStr = versions.get(gameName);
-                    if(versionStr != null && versionStr.equals(version.getName())) {
-                        try(FileReader reader = new FileReader(version)){
+                    String versionFromFile = version.getName();
+                    int index = versionFromFile.lastIndexOf('.');
+                    if(index > 0)
+                    {
+                        versionFromFile = versionFromFile.substring(0, index);
+                    }
+
+                    if(versionStr != null && versionStr.equals(versionFromFile)) {
+                        try(BufferedReader reader = Files.newBufferedReader(version.toPath(), StandardCharsets.UTF_8)){
                             Game game = gson.fromJson(reader, Game.class);
                             dataPackage.update(gameName, game);
                             LOGGER.info("Read datapackage for Game: ".concat(gameName).concat(" Checksum: ").concat(version.getName()));
@@ -315,7 +322,7 @@ public abstract class Client {
                 }
 
                 //if key is for this game
-                File filePath = dataPackageLocation.resolve(safeName).resolve(gameVersion).toFile();
+                File filePath = dataPackageLocation.resolve(safeName).resolve(gameVersion + ".json").toFile();
 
                 try (Writer writer = Files.newBufferedWriter(filePath.toPath(), StandardCharsets.UTF_8)){
                     //if game is in list of games, save it
