@@ -278,7 +278,11 @@ class WebSocket extends WebSocketClient {
         sendManyPackets(new APPacket[]{packet});
     }
 
-    private void sendManyPackets(APPacket[] packet) {
+    void sendManyPackets(APPacket[] packet) {
+        sendManyPackets(Arrays.asList(packet));
+    }
+
+    void sendManyPackets(List<APPacket> packet) {
         if (!isOpen())
             return;
         String json = gson.toJson(packet);
