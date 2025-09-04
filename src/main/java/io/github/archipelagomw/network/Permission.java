@@ -1,6 +1,8 @@
 package io.github.archipelagomw.network;
 
-public enum Permission {
+import io.github.archipelagomw.utils.IntEnum;
+
+public enum Permission implements IntEnum {
     disabled(0b000),
     enabled(0b001),
     goal(0b010),
@@ -10,5 +12,10 @@ public enum Permission {
     public final int value;
     Permission(int value) {
         this.value=value;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 }

@@ -37,7 +37,7 @@ public abstract class Client {
     private final static Logger LOGGER = Logger.getLogger(Client.class.getName());
 
     public static final Version protocolVersion = new Version(0, 6, 1);
-    private final static Gson gson = new Gson();
+    private final static Gson gson = GsonUtils.getGson();
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
 
@@ -135,7 +135,7 @@ public abstract class Client {
             this.tags.clear();
             this.tags.addAll(tags);
             APResult<Void> ret = ensureConnectedAndAuth();
-            if(ret == null) {
+            if(ret.getCode() == APResult.ResultCode.SUCCESS) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
@@ -154,7 +154,7 @@ public abstract class Client {
     public APResult<Void> addTag(String tag) {
         if(tags.add(tag)) {
             APResult<Void> ret = ensureConnectedAndAuth();
-            if(ret == null) {
+            if(ret.getCode() == APResult.ResultCode.SUCCESS) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
@@ -173,7 +173,7 @@ public abstract class Client {
     public APResult<Void> removeTag(String tag) {
         if(tags.remove(tag)) {
             APResult<Void> ret = ensureConnectedAndAuth();
-            if(ret == null) {
+            if(ret.getCode() == APResult.ResultCode.SUCCESS) {
                 ConnectUpdatePacket packet = new ConnectUpdatePacket();
                 packet.tags = this.tags;
                 webSocket.sendPacket(packet);
@@ -494,7 +494,7 @@ public abstract class Client {
      */
     public APResult<Void> sendChat(String message) {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             webSocket.sendChat(message);
             ret = APResult.success();
@@ -527,7 +527,7 @@ public abstract class Client {
      */
     public APResult<Void> scoutLocations(ArrayList<Long> locationIDs) {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS )
         {
             locationIDs.removeIf( location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
             webSocket.scoutLocation(locationIDs);
@@ -546,10 +546,10 @@ public abstract class Client {
     public APResult<Void> scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
     {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
-            webSocket.scoutlocations(locationIDs, createAsHint.value);
+            webSocket.scoutLocations(locationIDs, createAsHint.value);
             ret = APResult.success();
         }
         return ret;
@@ -626,7 +626,7 @@ public abstract class Client {
         {
             return APResult.unauthenticated();
         }
-        return null;
+        return APResult.success();
     }
     /**
      * Update the current game status.
@@ -637,7 +637,7 @@ public abstract class Client {
      */
     public APResult<Void> setGameState(ClientStatus status) {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(new StatusUpdatePacket(status));
             ret = APResult.success();
         }
@@ -650,7 +650,7 @@ public abstract class Client {
      */
     public APResult<Void> sync() {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(new SyncPacket());
             ret = APResult.success();
         }
@@ -664,7 +664,7 @@ public abstract class Client {
      */
     public APResult<Void> sendBounce(BouncePacket bouncePacket) {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(bouncePacket);
             ret = APResult.success();
         }
@@ -721,7 +721,7 @@ public abstract class Client {
      */
     public APResult<Integer> dataStorageSet(SetPacket setPacket) {
         APResult<Integer> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(setPacket);
             ret = APResult.success(setPacket.getRequestID());
         }
@@ -736,7 +736,7 @@ public abstract class Client {
      */
     public APResult<Void> dataStorageSetNotify(Collection<String> keys) {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(new SetNotifyPacket(keys));
             ret = APResult.success();
         }
@@ -791,7 +791,7 @@ public abstract class Client {
     public APResult<Integer> dataStorageGet(Collection<String> keys) {
         GetPacket getPacket = new GetPacket(keys);
         APResult<Integer> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendPacket(getPacket);
             ret = APResult.success(getPacket.getRequestID());
         }
@@ -807,7 +807,7 @@ public abstract class Client {
     public APResult<Void> sendDeathlink(String source, String cause)
     {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             deathLinkHandler.sendDeathLink(source, cause);
             ret = APResult.success();
         }
@@ -834,7 +834,7 @@ public abstract class Client {
     public APResult<Void> sendPackets(List<APPacket> packets)
     {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null) {
+        if(ret.getCode() == APResult.ResultCode.SUCCESS) {
             webSocket.sendManyPackets(packets);
             ret = APResult.success();
         }
@@ -851,7 +851,7 @@ public abstract class Client {
     public APResult<Void> createHints(List<Long> locations, int player, HintStatus status)
     {
         APResult<Void> ret = ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             CreateHintPacket packet = new CreateHintPacket(locations, player, status);
             webSocket.sendPacket(packet);

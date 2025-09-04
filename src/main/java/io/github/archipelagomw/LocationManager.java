@@ -30,7 +30,7 @@ public class LocationManager {
         LocationChecks packet = new LocationChecks();
         packet.locations.addAll(ids);
         APResult<Void> ret = client.ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             webSocket.sendPacket(packet);
             ret = APResult.success();
@@ -51,7 +51,7 @@ public class LocationManager {
             return APResult.success();
         }
         APResult<Void> ret = client.ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             webSocket.sendPacket(packet);
             ret = APResult.success();
@@ -63,7 +63,7 @@ public class LocationManager {
         LocationChecks packet = new LocationChecks();
         packet.locations = checkedLocations;
         APResult<Void> ret = client.ensureConnectedAndAuth();
-        if(ret == null)
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             webSocket.sendPacket(packet);
             ret = APResult.success();

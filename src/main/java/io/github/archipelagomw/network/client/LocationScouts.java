@@ -16,9 +16,9 @@ public class LocationScouts extends APPacket {
         this(locations, null);
     }
 
-    public LocationScouts(ArrayList<Long> locations, Integer createAsHint) {
+    public LocationScouts(ArrayList<Long> locations, CreateAsHint createAsHint) {
         super(APPacketType.LocationScouts);
         this.locations = locations;
-        this.createAsHint = createAsHint;
+        this.createAsHint = createAsHint == null ? null : createAsHint.getValue();
     }
 }
