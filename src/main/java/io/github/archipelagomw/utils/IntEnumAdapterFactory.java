@@ -9,12 +9,8 @@ import com.google.gson.stream.JsonWriter;
 import io.github.archipelagomw.network.client.HintStatus;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -38,10 +34,6 @@ public class IntEnumAdapterFactory implements TypeAdapterFactory {
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) throws Throwable {
-        new IntEnumAdapter<>(HintStatus.class);
     }
 
     private static class IntEnumAdapter<T extends Enum<T> & IntEnum> extends TypeAdapter<T>
