@@ -548,8 +548,16 @@ public abstract class Client {
         APResult<Void> ret = ensureConnectedAndAuth();
         if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
-            locationIDs.removeIf(location -> !dataPackage.getGame(game).locationNameToId.containsValue(location));
-            webSocket.scoutLocations(locationIDs, createAsHint.value);
+            ArrayList<Long> sendMe = new ArrayList<>();
+            locationIDs.stream().filter(location -> locationManager.getCheckedLocations().contains(location) ||
+                                    locationManager.getMissingLocations().contains(location))
+                    .forEach(sendMe::add);
+            if(sendMe.isEmpty())
+            {
+                LOGGER.fine("Locations provided for scout do not exist for this world");
+                return APResult.error();
+            }
+            webSocket.scoutLocations(sendMe, createAsHint);
             ret = APResult.success();
         }
         return ret;
@@ -853,7 +861,15 @@ public abstract class Client {
         APResult<Void> ret = ensureConnectedAndAuth();
         if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
-            CreateHintPacket packet = new CreateHintPacket(locations, player, status);
+            ArrayList<Long> sendMe = new ArrayList<>();
+            locations.stream().filter(location -> locationManager.getMissingLocations().contains(location))
+                    .forEach(sendMe::add);
+            if(locations.isEmpty())
+            {
+                LOGGER.fine("Locations provided for create hint all either checked or do not exist");
+                return APResult.error();
+            }
+            CreateHintPacket packet = new CreateHintPacket(sendMe, player, status);
             webSocket.sendPacket(packet);
             ret = APResult.success();
         }
