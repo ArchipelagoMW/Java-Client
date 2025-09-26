@@ -26,7 +26,7 @@ public class EventManager {
     public void registerListener(Object listener) {
         Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
         for (Method method : methods) {
-            if (isEventListenerMethod(listener, method)) continue;
+            if (isNotEventListenerMethod(listener, method)) continue;
 
             registeredListeners.put(method, listener);
         }
@@ -41,13 +41,13 @@ public class EventManager {
     public void unRegisterListener(Object listener) {
         Method[] methods = listener instanceof Class ? ((Class<?>)listener).getMethods() : listener.getClass().getMethods();
         for (Method method : methods) {
-            if (isEventListenerMethod(listener, method)) continue;
+            if (isNotEventListenerMethod(listener, method)) continue;
 
             registeredListeners.remove(method, listener);
         }
     }
 
-    private boolean isEventListenerMethod(Object listener, Method method) {
+    private boolean isNotEventListenerMethod(Object listener, Method method) {
         if(listener instanceof Class<?>)
             if (!Modifier.isStatic(method.getModifiers()))
                 return true;

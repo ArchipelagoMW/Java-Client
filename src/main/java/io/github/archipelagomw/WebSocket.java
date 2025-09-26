@@ -1,9 +1,6 @@
 package io.github.archipelagomw;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import io.github.archipelagomw.Print.APPrint;
 import io.github.archipelagomw.Print.APPrintJsonType;
 import io.github.archipelagomw.Print.APPrintPart;
@@ -12,10 +9,7 @@ import io.github.archipelagomw.events.*;
 import io.github.archipelagomw.flags.NetworkPlayer;
 import io.github.archipelagomw.network.APPacket;
 import io.github.archipelagomw.network.ConnectionResult;
-import io.github.archipelagomw.network.client.ConnectPacket;
-import io.github.archipelagomw.network.client.GetDataPackagePacket;
-import io.github.archipelagomw.network.client.LocationScouts;
-import io.github.archipelagomw.network.client.SayPacket;
+import io.github.archipelagomw.network.client.*;
 import io.github.archipelagomw.network.server.*;
 import io.github.archipelagomw.parts.DataPackage;
 import io.github.archipelagomw.parts.NetworkItem;
@@ -40,7 +34,8 @@ class WebSocket extends WebSocketClient {
 
     private final Client client;
 
-    private final Gson gson = new Gson();
+    // TODO: why do we have multiple of this class floating around?
+    private final Gson gson = GsonUtils.getGson();
 
     private boolean authenticated = false;
 
@@ -278,7 +273,11 @@ class WebSocket extends WebSocketClient {
         sendManyPackets(new APPacket[]{packet});
     }
 
-    private void sendManyPackets(APPacket[] packet) {
+    void sendManyPackets(APPacket[] packet) {
+        sendManyPackets(Arrays.asList(packet));
+    }
+
+    void sendManyPackets(List<APPacket> packet) {
         if (!isOpen())
             return;
         String json = gson.toJson(packet);
@@ -366,7 +365,7 @@ class WebSocket extends WebSocketClient {
         sendPacket(packet);
     }
 
-    public void scoutlocations(ArrayList<Long> locationIDs, int createAsHint)
+    public void scoutLocations(ArrayList<Long> locationIDs, CreateAsHint createAsHint)
     {
         LocationScouts packet = new LocationScouts(locationIDs, createAsHint);
         sendPacket(packet);

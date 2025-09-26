@@ -19,27 +19,26 @@ public class LocationManager {
         this.client = client;
     }
 
-    public boolean checkLocation(long id) {
+    public APResult<Void> checkLocation(long id) {
         return checkLocations(new ArrayList<Long>(1) {{add(id);}});
     }
 
-    public boolean checkLocations(Collection<Long> ids) {
+    public APResult<Void> checkLocations(Collection<Long> ids) {
         ids.removeIf( location -> !missingLocations.contains(location));
         checkedLocations.addAll(ids);
         missingLocations.removeAll(ids);
         LocationChecks packet = new LocationChecks();
         packet.locations.addAll(ids);
-        if(webSocket == null)
-            return false;
-
-        if(webSocket.isAuthenticated()) {
+        APResult<Void> ret = client.ensureConnectedAndAuth();
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
+        {
             webSocket.sendPacket(packet);
-            return true;
+            ret = APResult.success();
         }
-        return false;
+        return ret;
     }
 
-    public void sendIfChecked(Set<Long> missingChecks) {
+    public APResult<Void> sendIfChecked(Set<Long> missingChecks) {
         LocationChecks packet = new LocationChecks();
         packet.locations = new HashSet<>();
         for (Long missingCheck : missingChecks) {
@@ -47,16 +46,29 @@ public class LocationManager {
                 packet.locations.add(missingCheck);
             }
         }
-        if(webSocket != null && !packet.locations.isEmpty())
+        if(packet.locations.isEmpty())
+        {
+            return APResult.success();
+        }
+        APResult<Void> ret = client.ensureConnectedAndAuth();
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
+        {
             webSocket.sendPacket(packet);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
-    public void resendAllCheckedLocations() {
-        if (webSocket == null)
-                return;
+    public APResult<Void> resendAllCheckedLocations() {
         LocationChecks packet = new LocationChecks();
         packet.locations = checkedLocations;
-        webSocket.sendPacket(packet);
+        APResult<Void> ret = client.ensureConnectedAndAuth();
+        if(ret.getCode() == APResult.ResultCode.SUCCESS)
+        {
+            webSocket.sendPacket(packet);
+            ret = APResult.success();
+        }
+        return ret;
     }
 
     void setAPWebSocket(WebSocket webSocket) {
