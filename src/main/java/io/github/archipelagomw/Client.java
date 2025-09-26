@@ -862,8 +862,10 @@ public abstract class Client {
         if(ret.getCode() == APResult.ResultCode.SUCCESS)
         {
             ArrayList<Long> sendMe = new ArrayList<>();
-            locations.stream().filter(location -> locationManager.getMissingLocations().contains(location))
-                    .forEach(sendMe::add);
+            if(player == this.slot) {
+                locations.stream().filter(location -> locationManager.getMissingLocations().contains(location))
+                        .forEach(sendMe::add);
+            }
             if(locations.isEmpty())
             {
                 LOGGER.fine("Locations provided for create hint all either checked or do not exist");
