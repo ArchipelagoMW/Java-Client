@@ -18,4 +18,4 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - name: Submit Dependency Snapshot
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v5
