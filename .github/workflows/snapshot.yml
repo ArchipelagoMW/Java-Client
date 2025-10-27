@@ -36,13 +36,13 @@ jobs:
         run: ./gradlew jreleaserDeploy
       - name: Store JReleaser Logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jreleaser
           path: build/jreleaser
       - name: Store Reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: reports
           path: build/reports
