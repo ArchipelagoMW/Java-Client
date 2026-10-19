@@ -4,9 +4,9 @@
 [versions]
 junit-jupiter = "5.13.4"
 java-websocket = "1.6.0"
-gson = "2.13.2"
-httpclient = "5.6.1"
-httpcore = "5.3.6"
+gson = "2.14.0"
+httpclient = "5.6.4"
+httpcore = "5.4.2"
 
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
