@@ -19,7 +19,7 @@ public class EventManager {
 
     /**
      * Use to register for Events that come from the Archipelago server.
-     * supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
+     * The supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
      * and have 1 parameter that extends {@link Event}
      * @param listener the object containing a listener method.
      */
@@ -34,7 +34,7 @@ public class EventManager {
 
     /**
      * Use to unregister for Events that come from the Archipelago server.
-     * supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
+     * The supplied Object must have at least 1 method annotated with {@link ArchipelagoEventListener}
      * and have 1 parameter that extends {@link Event}
      * @param listener the object containing a listener method.
      */

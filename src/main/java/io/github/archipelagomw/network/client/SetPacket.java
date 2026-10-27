@@ -61,7 +61,7 @@ public class SetPacket extends APPacket {
     }
 
     /**
-     * A DataStorageOperation manipulates or alters the value of a key in the servers data storage.
+     * A DataStorageOperation manipulates or alters the value of a key in the server's data storage.
      * If the operation transforms the value from one state to another then the current value
      * of the key is used as the starting point otherwise the Set's package default is used if
      * the key does not exist on the server already. DataStorageOperations consist of an object
@@ -125,7 +125,7 @@ public class SetPacket extends APPacket {
         MULTIPLY,
 
         /**
-         * Multiplies the current value of the key on the server to the power of @value.
+         * Raises the current value of the key on the server to the power of @value.
          */
         @SerializedName("pow")
         POWER,

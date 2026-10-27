@@ -49,7 +49,7 @@ public enum APPrintJsonType {
     /**
      * The client has triggered a tutorial message, such as when first connecting.
      */
-    @SerializedName("entrance_name")
+    @SerializedName("Tutorial")
     Tutorial,
 
     /**
