@@ -3,7 +3,7 @@ import org.jreleaser.model.Active
 plugins {
     `java-library`
     `maven-publish`
-    id("org.jreleaser") version "1.23.0"
+    id("org.jreleaser") version "1.26.0"
 }
 
 val snapshot = providers.gradleProperty("snapshot").getOrElse("false")
