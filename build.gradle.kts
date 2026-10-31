@@ -8,7 +8,7 @@ plugins {
 
 val snapshot = providers.gradleProperty("snapshot").getOrElse("false")
 group = "io.github.archipelagomw"
-version = "0.2.1" + if("true" == snapshot) "-SNAPSHOT" else ""
+version = "0.2.2" + if("true" == snapshot) "-SNAPSHOT" else ""
 
 repositories {
     mavenCentral()
